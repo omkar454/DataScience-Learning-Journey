@@ -1,0 +1,677 @@
+1) Docker pull command to pull any image from docker hub-:
+docker pull docker/image_name_in_dockerhub
+This above command will pull image from docker hub and download it in our local device. It will just download but NOT run the image to create a container.
+For running the image there is a seperate docker command.
+
+ex-:  
+PS C:\Users\Omkar Raut> docker pull docker/getting-started
+Using default tag: latest
+latest: Pulling from docker/getting-started
+" Here While pulling the getting started image from docker hub-: docker has pulled all the layers of 'getting-started' image and downloaded them as shown below-: "
+1e35f6679fab: Pull complete   
+f1d1c9928c82: Pull complete
+cb9626c74200: Pull complete
+4f7e34c2de10: Pull complete
+ee68d3549ec8: Pull complete
+c158987b0551: Pull complete
+33e0cbbb4673: Pull complete
+9b6f639ec6ea: Pull complete
+b6334b6ace34: Pull complete
+"These above are all layers and combining all these layers results into a single 'getting-started' docker image."
+Digest: sha256:d79336f4812b6547a53e735480dde67f8f8f7071b414fbd9297609ffb989abc1
+Status: Downloaded newer image for docker/getting-started:latest
+docker.io/docker/getting-started:latest
+
+2) Docker command to list all the docker images present in our local server-:
+docker images
+ex-:
+PS C:\Users\Omkar Raut> docker images
+REPOSITORY               TAG       IMAGE ID       CREATED       SIZE
+docker/getting-started   latest    d79336f4812b   3 years ago   73.9MB
+
+3) Docker command to run the image and then resulting in creation of container-:
+```
+docker run -d -p 80:80 docker/getting-started
+```
+### 🔹 Meaning
+
+#### 1. `docker run`
+
+* Creates and starts a new container from an image
+* Main command used to run containers in **Docker**
+
+---
+
+#### 2. `-d` (Detached Mode)
+
+* Runs the container in the background
+* Terminal remains free for other commands
+
+---
+
+#### 3. `-p 80:80` (Port Mapping)
+
+* Maps ports between host and container
+* Format: `host_port : container_port`
+* Here:
+
+  * `80` (host) → `80` (container)
+* Access via: `http://localhost`
+
+So; we are accessing the application which is at port: 80 within the container via port: 80 of local host(our local device) via port mapping functionality of "docker run" command
+---
+
+#### 4. `docker/getting-started` (Image Name)
+
+* Name of the Docker image used to create container
+* If not available locally, Docker pulls it from **Docker Hub** and then installs it in your local server and then runs the pulled image.
+
+First; we need to pull & download the image in local server and then only it can run in our local server.
+* DOCKER RUN command can do both pulling image from DOCER-HUB and then running the image resulting in creation of a container if the image is NOT available in our LOCAL-SERVER .
+* If the IMAGE is PRESENT in our LOCAL-SERVER then "DOCKER RUN" COMMAND will just RUN THE IMAGE locally present in our DEVICE resulting in CREATION OF CONTAINER.
+
+ex-:
+PS C:\Users\Omkar Raut> docker run hello-world
+Unable to find image 'hello-world:latest' locally
+latest: Pulling from library/hello-world
+17eec7bbc9d7: Pull complete
+Digest: sha256:85404b3c53951c3ff5d40de0972b1bb21fafa2e8daa235355baf44f33db9dbdd
+Status: Downloaded newer image for hello-world:latest
+
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+
+To generate this message, Docker took the following steps:
+ 1. The Docker client contacted the Docker daemon.
+ 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+    (amd64)
+ 3. The Docker daemon created a new container from that image which runs the
+    executable that produces the output you are currently reading.
+ 4. The Docker daemon streamed that output to the Docker client, which sent it
+    to your terminal.
+
+To try something more ambitious, you can run an Ubuntu container with:
+ $ docker run -it ubuntu bash
+
+Share images, automate workflows, and more with a free Docker ID:
+ https://hub.docker.com/
+
+For more examples and ideas, visit:
+ https://docs.docker.com/get-started/
+
+PS C:\Users\Omkar Raut>
+
+---
+
+### 🔹 Overall Function
+
+* Downloads image (if needed)
+* Creates container
+* Runs it in background
+* Maps port 80 for browser access
+
+---
+
+### 🔹 Output Result
+
+* A running container with a web app
+* Accessible at: `http://localhost`
+
+## 📝 Reason for Port Mapping (Docker) in `docker run` Command
+
+### 🔹 Main Reason
+* Containers are **isolated (separate environments)**
+* Applications inside them are **not directly accessible**
+* To access these applications, we **map a port of the local system (host)** to the **port used by the application inside the container**
+
+👉 This allows us to access the container’s application through `localhost`
+
+---
+
+### 🔹 Why Port Mapping is Needed
+
+#### 1. Access Application
+
+* To open container apps in browser (`localhost`)
+
+#### 2. Enable Communication
+
+* Allows your system to **talk to the container**
+
+#### 3. Testing & Development
+
+* Developers can test apps running inside containers
+
+#### 4. Multiple Containers
+
+* Helps run multiple apps using different ports
+
+---
+
+### 🔹 Example (Multiple Port Mapping for Clarity)
+
+```bash
+docker run -d -p 3000:80 -p 5000:80 nginx
+```
+
+* `localhost:3000` → container port 80
+* `localhost:5000` → container port 80
+  👉 Same container app accessed using different ports
+
+---
+
+### 🔹 Why Container Port Cannot Be Changed ❌
+
+* Defined by the **application inside container**
+* Docker only maps ports, it **does not change internal ports**
+* To change it → need to modify app or rebuild image
+
+---
+
+### 🔹 Key Points
+
+* ✅ Host port can be changed
+* ❌ Container port cannot be changed directly
+* One container port can map to multiple host ports
+* You can easily check the container port by looking at the documentation of that container/image in the dockerHub. The dockerHub clearly shows the container port of that paricular container/image.
+
+---
+
+### 🔹 One Line Summary
+
+👉 Port mapping is needed to **access and communicate with applications inside Docker containers**, while the **container port remains fixed by the application and the container within which it is running.**
+
+ex-:
+PS C:\Users\Omkar Raut> docker run -d -p 80:80 docker/getting-started
+dea896616b974c11be5b18a7bc64ca185c6ffa02ab04cff8144cf8de3012610b
+
+
+## 📝 Output of `docker run` Command
+
+### 🔹 Your Output
+
+```
+dea896616b974c11be5b18a7bc64ca185c6ffa02ab04cff8144cf8de3012610b
+```
+
+---
+
+### 🔹 What is this?
+
+👉 This is the **Container ID**
+
+---
+
+### 🔹 Meaning
+
+* It is a **unique identifier** given to your running container
+* Every container in **Docker** has its own ID
+
+---
+
+### 🔹 Why it is Important
+
+* Used to:
+
+* Check container status → `docker ps`
+* Stop container → `docker stop <container_id>`
+  * Remove container → `docker rm <container_id>`
+
+---
+
+### 🔹 Key Point
+
+* Since you used `-d` (detached mode), Docker runs the container in background
+* So instead of logs, it shows **container ID**
+
+---
+
+### 🔹 One Line Summary
+
+👉 The output is a **unique container ID** of the running Docker container
+
+4) DOCKER COMMAND TO CHECK STATUS OF CONTAINERS-:
+### 🔹 Command
+```
+docker ps
+```
+
+---
+
+### 🔹 Use
+
+👉 Shows **list of running containers**
+
+---
+
+### 🔹 What Information It Gives
+
+* Container ID
+* Image name
+* Status (running or not)
+* Ports
+* Container name
+
+---
+
+### 🔹 Why It is Used
+
+1. To check **which containers are running**
+2. To get **container ID** for further commands
+3. To verify if your container started successfully
+
+---
+
+### 🔹 Extra
+
+```bash
+docker ps -a
+```
+
+👉 Shows **all containers** (running + stopped)
+
+---
+
+### 🔹 One Line Summary
+
+👉 `docker ps` is used to **view running Docker containers**
+ex-:
+PS C:\Users\Omkar Raut> docker ps
+CONTAINER ID   IMAGE                    COMMAND                  CREATED         STATUS         PORTS                                 NAMES
+dea896616b97   docker/getting-started   "/docker-entrypoint.…"   4 minutes ago   Up 4 minutes   0.0.0.0:80->80/tcp, [::]:80->80/tcp   jolly_sammet
+
+👉 **`jolly_sammet`** is the **container name**
+
+* 0.0.0.0. refers to Local host and can also be written as: 127.0.0.1
+* Since; HOST_PORT = 80 & CONTAINER_PORT=80. So; In order to access the application within the container on our local maching after running the image via "docker run" command then go to browser and type: 127.0.0.1:80. Here; "80" refers to the HOST_PORT and then clicking ENTER you will access the application which is running within the container on your local-device.
+
+* Docker automatically assigns a **random name** if you don’t provide one
+* Used to **identify the container easily** (instead of long container ID)
+
+✅ You can also set your own name using:
+```
+docker run --name my_container name_assigned_by_you
+```
+
+5) DOCKER COMMAND TO STOP RUNNING A CONTAINER
+```
+docker stop <container_id or name>
+```
+
+ex-:
+PS C:\Users\Omkar Raut> docker ps
+CONTAINER ID   IMAGE                    COMMAND                  CREATED          STATUS          PORTS                                 NAMES
+dea896616b97   docker/getting-started   "/docker-entrypoint.…"   27 minutes ago   Up 27 minutes   0.0.0.0:80->80/tcp, [::]:80->80/tcp   jolly_sammet
+
+PS C:\Users\Omkar Raut> docker stop jolly_sammet
+jolly_sammet
+
+PS C:\Users\Omkar Raut> docker ps
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+
+🔹 One Line
+👉 Used to gracefully stop a running Docker container
+
+So; The image of that container will be still there in our local device cause we have just STOPPED a running container but have NOT deleted its IMAGE from local device.
+PS C:\Users\Omkar Raut> docker images
+REPOSITORY               TAG       IMAGE ID       CREATED       SIZE
+docker/getting-started   latest    d79336f4812b   3 years ago   73.9MB
+
+## 📝 Important Note (Port Usage in Docker)
+
+### 🔹 Statement
+
+👉 We cannot run multiple containers on the same host port
+
+---
+
+### 🔹 Explanation
+
+* A **host port can be used by only one container at a time**
+* If another container tries to use the same port → it will give an **error**
+
+---
+
+### 🔹 Example
+
+❌ Not Allowed:
+
+```bash
+docker run -p 3000:80 nginx
+docker run -p 3000:80 apache
+```
+
+✔️ Allowed:
+
+```bash
+docker run -p 3000:80 nginx
+docker run -p 4000:80 apache
+```
+
+---
+
+### 🔹 One Line Summary
+
+👉 Each container must use a **unique host port** to run simultaneously
+
+6) DOCKER COMMAND TO DELETE A CONTAINER-:
+
+## 📝 Delete Container Command (Docker)
+
+### 🔹 Command
+
+```bash
+docker rm <container_id or name>
+```
+
+---
+
+### 🔹 Use
+
+👉 Deletes a **stopped container**
+
+---
+
+### 🔹 Example
+
+```bash
+docker rm jolly_sammet
+```
+
+---
+
+### 🔹 Important
+
+* Container must be **stopped first**
+* Otherwise, it will give an error
+
+---
+
+### 🔹 Force Delete (if running)
+
+```bash
+docker rm -f <container_id>
+```
+
+---
+
+### 🔹 One Line Summary
+
+👉 `docker rm` is used to **delete a Docker container**
+
+
+7) DOCKER COMMAND TO DELETE AN IMAGE-:
+
+## 📝 `docker image rm` Command & Error (Combined Notes)
+
+---
+
+### 🔹 Command
+
+```
+docker image rm image_id/image_name
+```
+
+---
+
+### 🔹 Meaning
+
+👉 Deletes a Docker image using its **image ID** or **image_name**
+
+---
+
+## ❌ Error Message
+
+```
+PS C:\Users\Omkar Raut> docker image rm d79336f4812b                                                           
+Error response from daemon: conflict: unable to delete d79336f4812b (must be forced) - image is being used by stopped container f8527cea4737
+```
+
+---
+
+### 🔹 Why This Error Occurred
+
+* The image is **linked to a container**
+* The container is **stopped but still exists**
+* Docker does **not allow deleting images** used by any container whetejr it is STOPPED or RUNNING -: It does NOT matter.
+
+---
+
+### 🔹 Reason for This Restriction
+
+* A container is **created from an image**
+* It still **depends on that image**
+* Deleting the image would **break the container**
+
+---
+
+### 🔹 Simple Understanding
+
+* Image = **Template**
+* Container = **Instance of that template**
+  👉 Deleting template while instance exists → causes problem
+
+---
+
+## 🔹 How to Fix
+
+### ✅ Option 1: Remove container first
+
+```bash
+docker rm f8527cea4737
+docker image rm <image_id>
+```
+
+---
+
+### ✅ Option 2: Force delete
+
+```bash
+docker image rm -f <image_id>
+```
+
+---
+
+### 🔹 One Line Summary
+
+👉 Image cannot be deleted because it is **still used by a container**, and Docker prevents this to **avoid breaking dependencies**
+
+## 📝 Is Force Delete Possible with Running Container?
+
+### 🔹 Answer
+
+❌ **No, it is NOT possible**
+
+---
+
+### 🔹 Reason
+
+* Docker **does not allow deleting an image** if a container is **running using it**
+* Even with `-f` (force), it will **fail**
+
+---
+
+### 🔹 What You Must Do
+
+1. Stop the container
+2. Remove the container
+3. Then delete the image
+
+---
+
+### 🔹 One Line Summary
+
+👉 You **cannot force delete an image** while a container is actively running on it.
+       You can do force deleting of an image only if NO containers are running from that image.
+
+ex-:
+PS C:\Users\Omkar Raut> docker image rm d79336f4812b
+Error response from daemon: conflict: unable to delete d79336f4812b (must be forced) - image is being used by stopped container f8527cea4737
+"forcefully deleting the image-:"
+PS C:\Users\Omkar Raut> docker image rm -f d79336f4812b
+Untagged: docker/getting-started:latest
+Deleted: sha256:d79336f4812b6547a53e735480dde67f8f8f7071b414fbd9297609ffb989abc1
+PS C:\Users\Omkar Raut> docker images
+REPOSITORY   TAG       IMAGE ID   CREATED   SIZE
+PS C:\Users\Omkar Raut>
+
+* So; it is BEST PRACTICE TO FOLLOW THESE STEPS-:
+     1) STOP RUNING CONTAINER
+     2) DELETE THE STOPED CONTAINER
+     3) THEN DELETE THE IMAGE OF THAT STOPED CONTAINER
+
+
+## 📝 Tags in Docker Images (With Proper Usage Examples)
+
+### 🔹 What are Tags?
+
+👉 Tags are **labels given to Docker images** to identify different versions
+
+---
+
+### 🔹 Purpose
+
+* Helps to **differentiate versions** of the same image
+* Makes it easy to **use a specific version**
+
+---
+
+### 🔹 Format
+
+```bash
+<image_name>:<tag>
+```
+
+---
+
+### 🔹 Examples with Docker Commands
+
+#### 1. Using Default Tag (`latest`)
+
+```bash
+docker run nginx
+```
+
+➡️ Automatically uses:
+
+```bash
+docker run nginx:latest
+```
+
+---
+
+#### 2. Using Specific Version
+
+```bash
+docker run nginx:1.25
+```
+
+👉 Runs a specific version instead of latest. 
+       1.25 → specific version of image "nginx"
+    
+
+---
+
+#### 3. Pulling Specific Version
+
+```bash
+docker pull nginx:1.25
+```
+
+---
+
+#### 4. Building Image with Tag
+
+```bash
+docker build -t myapp:1.0 .
+```
+
+👉 Creates image with version `1.0`
+
+---
+
+### 🔹 Important Point ⚠️
+
+* If **no tag is given**, Docker uses **`latest` by default**
+
+---
+
+### 🔹 Why Tags are Important
+
+1. Version control
+2. Easy updates/rollbacks
+3. Avoid confusion between versions
+
+---
+
+### 🔹 One Line Summary
+
+👉 Tags represent **different versions of a Docker image**, and are used in Docker commands to **run, pull, and manage specific versions**. 
+* Tags can eithe be a numeric-: 1.25, 3.4, 8 etc, or can be alphabetic like -: trixie, 8-trixie, alpha etc.
+ex-:
+* docker pull redis:8.2.5-bookworm ; docker pull redis:8
+* here '8' and '8.2.5-bookworm' are different versions/tags of the same "redis" image in DOCKERHUB.
+
+## 📝 Port Rule in Docker (Important Note)
+
+### 🔹 Statement
+
+👉 Container ports can be the same, but host ports must be unique
+
+---
+
+### 🔹 Explanation
+
+* Multiple containers can run applications on the **same container port** (e.g., 80)
+* Each container has its own **isolated environment**
+* Containers **share the same OS kernel** but run separately
+* So, every container gets its own **independent set of ports internally**
+
+👉 But on the host system:
+
+* A port can be used by **only one container at a time**
+* Hence, **host ports must be unique**
+
+---
+
+### 🔹 Example
+
+✔️ Allowed:
+
+```bash
+docker run -p 3000:80 nginx
+docker run -p 4000:80 nginx
+```
+
+* Both containers use port `80` internally
+* Access via:
+
+  * `localhost:3000`
+  * `localhost:4000`
+
+---
+
+❌ Not Allowed:
+
+```bash
+docker run -p 3000:80 nginx
+docker run -p 3000:80 apache
+```
+
+* Same host port → conflict/error
+
+---
+
+### 🔹 One Line Summary
+
+👉 Containers can use the same internal ports due to isolation, but **host ports must be unique to avoid conflicts**
+
+📝 Conclusion (Docker Commands)
+
+👉 Docker commands are used to create, run, manage, and remove containers and images efficiently.
+👉 They help in running applications in isolated environments while sharing the same system resources.
+👉 Proper use of commands like run, ps, stop, and rm ensures smooth container management and deployment.
+
+🔹 One Line Summary
+
+👉 Docker commands make it easy to build, run, and manage applications in containers.

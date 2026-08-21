@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Feedback Form</title>
+
+<style>
+    /* Reset and base styles */
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        /* Replaced plain gray with a soft, modern gradient */
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 450px;
+        background: #ffffff;
+        padding: 35px 30px;
+        border-radius: 12px;
+        /* Softer, more modern shadow */
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 25px;
+        font-weight: 600;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        color: #555;
+        font-weight: 500;
+        font-size: 14px;
+    }
+
+    /* Input and Textarea Styling */
+    input[type="text"], 
+    input[type="email"], 
+    input[type="number"], 
+    textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        font-family: inherit;
+    }
+
+    textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    /* Focus effect for inputs */
+    input:focus, textarea:focus {
+        border-color: #4CAF50;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+    }
+
+    /* Modern Radio Button Styling */
+    .radio-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 5px;
+    }
+
+    .radio-group label {
+        margin-bottom: 0;
+        cursor: pointer;
+    }
+
+    /* Hide the default radio dot */
+    .radio-group input[type="radio"] {
+        display: none;
+    }
+
+    /* Style the text inside the label like a button/pill */
+    .radio-group span {
+        display: inline-block;
+        padding: 8px 16px;
+        background: #f4f4f4;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        color: #555;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+    /* Hover effect for the unselected radio pills */
+    .radio-group label:hover span {
+        background: #e9e9e9;
+    }
+
+    /* Style the pill when the hidden radio is checked */
+    .radio-group input[type="radio"]:checked + span {
+        background: #4CAF50;
+        border-color: #4CAF50;
+        color: white;
+        box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+    }
+
+    /* Submit Button Styling */
+    button {
+        width: 100%;
+        padding: 14px;
+        background: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s ease, transform 0.1s ease;
+        margin-top: 10px;
+    }
+
+    button:hover {
+        background: #45a049;
+    }
+
+    button:active {
+        transform: scale(0.98);
+    }
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>Feedback Form</h2>
+
+    <form action="/submit" method="POST">
+
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" placeholder="John Doe" required>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="john@example.com" required>
+        </div>
+
+        <div class="form-group">
+            <label for="age">Age</label>
+            <input type="number" id="age" name="age" placeholder="25" required>
+        </div>
+
+        <div class="form-group">
+            <label>Rating</label>
+            <div class="radio-group">
+                <label>
+                    <input type="radio" name="rating" value="Excellent" required>
+                    <span>Excellent</span>
+                </label>
+                <label>
+                    <input type="radio" name="rating" value="Good">
+                    <span>Good</span>
+                </label>
+                <label>
+                    <input type="radio" name="rating" value="Average">
+                    <span>Average</span>
+                </label>
+                <label>
+                    <input type="radio" name="rating" value="Poor">
+                    <span>Poor</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="suggestion">Your Suggestion</label>
+            <textarea id="suggestion" name="suggestion" placeholder="Tell us how we can improve..."></textarea>
+        </div>
+
+        <button type="submit">Submit Feedback</button>
+
+    </form>
+</div>
+
+</body>
+</html>

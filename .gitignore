@@ -1,0 +1,119 @@
+# ==========================================
+# GitIgnore for Data Science & Machine Learning
+# Workspace: DataScience-Learning-Journey
+# ==========================================
+
+# --- Virtual Environments ---
+DL-venv/
+venv1/
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+bin/
+include/
+lib/
+lib64/
+share/
+pyvenv.cfg
+
+# --- Python Bytecode & Cache ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.tox/
+
+# --- Jupyter Notebook Artifacts ---
+.ipynb_checkpoints/
+*-checkpoint.ipynb
+.ipython/
+
+# --- Machine Learning & Deep Learning Model Artifacts ---
+# Large binary model weights, checkpoints, and serialized objects
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+*.joblib
+*.pth
+*.pt
+*.onnx
+*.tflite
+*.pb
+*.bin
+*.ckpt
+*.safetensors
+*.model
+*.keras
+*.tensorboard
+
+# --- Data Science Data & Datasets (Optional/Large files) ---
+# Uncomment if dataset files should not be tracked by Git
+# *.csv
+# *.parquet
+# *.feather
+# *.npz
+# *.npy
+
+# --- Logs & Databases ---
+*.log
+logs/
+*.sqlite
+*.sqlite3
+*.db
+
+# --- Environment Variables & Secrets ---
+.env
+.env.*
+!.env.example
+secrets.json
+*.pem
+*.key
+
+# --- Flask / Web Application ---
+instance/
+.webassets-cache
+
+# --- IDE & Editor Settings ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.bak
+
+# --- OS Generated Files ---
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# --- Distribution & Build ---
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg

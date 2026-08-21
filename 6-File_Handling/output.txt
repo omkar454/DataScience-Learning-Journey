@@ -1,0 +1,3 @@
+This is a output.txt
+Please output it
+And learn it

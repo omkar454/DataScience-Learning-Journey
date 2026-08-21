@@ -1,0 +1,910 @@
+* Git is the free and open source distributed version control system 
+
+A **Distributed Version Control System (DVCS)** is a setup where every user has a full copy of the project’s entire history on their local machine, rather than relying on a single central server. This allows you to work offline, branch code quickly, and ensures that if the main server fails, any user's local copy can restore the project.
+
+**Open source** refers to software with source code that anyone can inspect, modify, and enhance because its design is publicly accessible. This collaborative model encourages transparency and community-driven innovation, allowing users to fix bugs or add features freely.
+Ex-: Linux; Python; Git; VLC Media Player
+
+
+### **Git Init Command**
+
+* **What it does:**
+    Initializes a new, empty **Git repository** in the current directory, turning a standard folder into a project that can track changes.
+* **What it creates:**
+    * A hidden folder named **.git**.
+    * This folder contains all the necessary metadata, object databases, and configuration files for version control.
+* **Key Point:**
+    You only run this **once** per project to start tracking its history.
+
+The `.git` folder is a **database** that stores the entire history, configuration, and branching information of your project. It is technically a directory (folder), though it functions as the "brain" of your repository and it is created on command-: "git init"
+
+### What it Contains
+* **Objects:** Every version of every file you've ever saved (commits).
+* **Refs:** Pointers to your branches (like `main`) and tags.
+* **Config:** Your project-specific settings (like the remote URL for GitHub).
+* **HEAD:** A file that keeps track of which branch you are currently working on.
+
+
+
+### Why it is Hidden
+It is hidden (starting with a `.`) to protect it from **accidental deletion or modification**. If you manually change or delete files inside this folder, you could corrupt your entire project history or lose the ability to track changes.
+
+### Why it isn't "Pushed"
+You don't push the `.git` folder because the GitHub server **already has its own version** of it. When you run `git push`, you are sending the *data* inside your `.git` folder to update the one on the server, rather than uploading the folder itself as a file.
+
+It is **by default** never pushed and does **not** need to be written in your `.gitignore` file. Git is designed to recognize its own internal "brain" and automatically excludes it from being tracked as a file within the project.
+
+
+
+### Why it stays local:
+* **Automatic Exclusion:** Git treats the `.git` folder as the repository itself, not as "content" to be versioned.
+* **Redundancy:** When you push, Git sends the *compressed data* (commits, blobs, and trees) stored inside that folder to the server's own `.git` directory.
+* **Safety:** If you were to track the `.git` folder inside itself, you would create an infinite loop of data.
+
+You only use `.gitignore` for files you **created** (like `node_modules`, `.env` secrets, or temporary build files) that you want Git to ignore.
+
+ex-:
+(base) C:\Users\Omkar Raut\Desktop\DataSceince>git init
+Initialized empty Git repository in C:/Users/Omkar Raut/Desktop/DataSceince/.git/
+
+(base) C:\Users\Omkar Raut\Desktop\DataSceince>
+
+* If you delete the ".git" folder then automatically git will STOP tracking the entire directory and entire history tracked by GIT will also be REMOVED and the git directory will again become the Normal directory
+
+* GIT user configuration commads-:
+
+git config --global user.name “[firstname lastname]”
+set a name that is identifiable for credit when review version history
+
+git config --global user.email “[valid-email]”
+set an email address that will be associated with each history marker
+
+These two commands are the **first steps** in setting up Git on any computer. They establish your **identity** so that every change you make is "signed" by you.
+
+### Why you need them:
+* **Accountability:** In a team, these commands ensure everyone knows who wrote which line of code. When you run `git log`, these details appear next to every commit.
+* **GitHub Integration:** GitHub uses the **email address** to link your local commits to your online GitHub profile. If the emails don't match, your "contribution green squares" won't show up.
+* **The `--global` Flag:** This means you only have to run these commands **once** on your computer. Git will remember these details for every project you start in the future.
+
+### How to check if they are set:
+If you want to see what name or email is currently stored, you can run:
+* `git config user.name`
+* `git config user.email`
+
+ex-:
+(base) C:\Users\Omkar Raut\Desktop\DataSceince>git config user.name
+omkar454
+#  omkar454 => username in github 
+(base) C:\Users\Omkar Raut\Desktop\DataSceince>git config user.email
+omraut41105@gmail.com 
+# omraut41105@gmail.com => user associated email with the omkar454 username's github account
+
+ADVICE: To keep username and email always same in both of your "git" & "github" accounts
+
+
+** Git Status Command ** 
+
+What it does: Shows the current state of the working directory and the staging area.
+
+Key Information it Displays:
+
+• Current Branch: Tells you which branch you are on.
+
+• Untracked Files: Files that exist but aren't being tracked by Git yet.
+
+• Modified Files: Files that have been changed but not yet staged.
+
+• Staged Changes: Files that are ready to be committed.
+
+When to use it: Run this frequently to see what changes have been made before staging or committing.
+
+ex-:
+(base) C:\Users\Omkar Raut\Desktop\DataSceince>git status
+On branch master
+
+No commits yet
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        .vscode/
+        1-PythonBasics/
+        10-Data_Analysis/
+        11-Working_With_DataBases/
+        12-Logging/
+        13-MultiThreading_and_Multiprocessing/
+        14-Memory_Management/
+        15-Flask/
+        2-ControlFlow/
+        3-DataStructures/
+        4-Functions/
+        5-Modules/
+        6-File_Handling/
+        7-Exception_Handling/
+        8-Class_and_Objects/
+        9-Advance_Python_Concepts/
+        DSA/
+        DSPL_MPR/
+        Docker/
+        EDA/
+        Feature-Enginerring/
+        Git_GitHub/
+        ML_Algo_Course/
+        ML_Algorithms/
+        Statistics/
+        conda _commands.txt
+        flask-WEBX/
+        requirements.txt
+        venv1/
+
+nothing added to commit but untracked files present (use "git add" to track)
+
+(base) C:\Users\Omkar Raut\Desktop\DataSceince>
+
+I've created a note for the `git add` command. It explains how to stage your changes and the difference between staging specific files versus all files in a directory.
+
+### **Git Add Command**
+
+* **What it does:**
+    Adds changes from your working directory to the **Staging Area**, selecting which modifications to include in the next commit.
+* **Common Usage:**
+    * `git add <file>`: Stages a specific file.
+    * `git add .`: Stages **all** new, modified, and deleted files in "cwd"  .i.e. current working local "GIT" branch of that LOCAL "GIT" REPO.
+* **Key Concept:**
+    Think of the staging area as a "pre-commit" zone where you organize your changes before officially saving them.
+
+ex-:
+
+(base) C:\Users\Omkar Raut\Desktop\DataSceince>git add 12-Logging
+warning: in the working copy of '12-Logging/12.1-Logging.ipynb', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '12-Logging/12.2-MultipleLogger.ipynb', LF will be replaced by CRLF the next time Git touches it
+
+(base) C:\Users\Omkar Raut\Desktop\DataSceince>git status
+On branch master
+
+No commits yet
+
+Changes to be committed:
+  (use "git rm --cached <file>..." to unstage)
+        new file:   12-Logging/12.1-Logging.ipynb
+        new file:   12-Logging/12.2-MultipleLogger.ipynb
+        new file:   12-Logging/app.log
+        new file:   12-Logging/app.py
+        new file:   12-Logging/app1.log
+        new file:   12-Logging/logs/__pycache__/logger.cpython-312.pyc
+        new file:   12-Logging/logs/app.log
+        new file:   12-Logging/logs/logger.py
+        new file:   12-Logging/logs/test.py
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        .vscode/
+        1-PythonBasics/
+        10-Data_Analysis/
+        11-Working_With_DataBases/
+        13-MultiThreading_and_Multiprocessing/
+        14-Memory_Management/
+        15-Flask/
+        2-ControlFlow/
+        3-DataStructures/
+        4-Functions/
+        5-Modules/
+        6-File_Handling/
+        7-Exception_Handling/
+        8-Class_and_Objects/
+        9-Advance_Python_Concepts/
+        DSA/
+        DSPL_MPR/
+        Docker/
+        EDA/
+        Feature-Enginerring/
+        Git_GitHub/
+        ML_Algo_Course/
+        ML_Algorithms/
+        Statistics/
+        conda _commands.txt
+        flask-WEBX/
+        requirements.txt
+        venv1/
+
+* Git Workflow: Staging, Committing, and Pushing-:
+
+1. Staging (The Preparation)
+
+Command: `git add <file>`
+
+• What it is: A middle ground between your working directory and the final local git repository.
+
+• Purpose: It allows you to select exactly which changes you want to include in your next "save point."
+
+2. Commit (The Save Point)
+
+Command: `git commit -m "message"`
+
+• What it is: Takes a snapshot of your staged changes which was done by "git add" command and saves them to the local repository on your computer.
+
+• Purpose: Creates a permanent record in your project's history with a unique ID.
+
+The -m flag stands for message. It allows you to write a brief description of your changes directly in the command line.
+
+If you don't use it, Git will automatically open a terminal-based text editor (like Vim or Nano) and force you to type a message there before it allows the commit to finish. This can be confusing for beginners because these editors require specific commands (like :wq in Vim) to save and exit.
+
+So; advice is to use "-m" tag in "git commit" command
+
+ex-: 
+
+(base) C:\Users\Omkar Raut\Desktop\DataSceince>git commit -m "testing"
+[master (root-commit) 5a15423] testing
+ 9 files changed, 379 insertions(+)
+ create mode 100644 12-Logging/12.1-Logging.ipynb
+ create mode 100644 12-Logging/12.2-MultipleLogger.ipynb
+ create mode 100644 12-Logging/app.log
+ create mode 100644 12-Logging/app.py
+ create mode 100644 12-Logging/app1.log
+ create mode 100644 12-Logging/logs/__pycache__/logger.cpython-312.pyc
+ create mode 100644 12-Logging/logs/app.log
+ create mode 100644 12-Logging/logs/logger.py
+ create mode 100644 12-Logging/logs/test.py
+
+(base) C:\Users\Omkar Raut\Desktop\DataSceince>git status
+On branch master
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        .vscode/
+        1-PythonBasics/
+        10-Data_Analysis/
+        11-Working_With_DataBases/
+        13-MultiThreading_and_Multiprocessing/
+        14-Memory_Management/
+        15-Flask/
+        2-ControlFlow/
+        3-DataStructures/
+        4-Functions/
+        5-Modules/
+        6-File_Handling/
+        7-Exception_Handling/
+        8-Class_and_Objects/
+        9-Advance_Python_Concepts/
+        DSA/
+        DSPL_MPR/
+        Docker/
+        EDA/
+        Feature-Enginerring/
+        Git_GitHub/
+        ML_Algo_Course/
+        ML_Algorithms/
+        Statistics/
+        conda _commands.txt
+        flask-WEBX/
+        requirements.txt
+        venv1/
+
+nothing added to commit but untracked files present (use "git add" to track)        
+
+(base) C:\Users\Omkar Raut\Desktop\DataSceince>                  
+
+
+3. Push (The Sharing)
+
+Command: `git push origin <branch>`
+
+• What it is: Sends your local commits which was done by "git commit"to a remote repository (like GitHub).
+
+• Purpose: Syncs your local work with the cloud so others can see it or so you have a backup online.
+
+
+* "Git Log" Command -:
+What it does: Displays a chronological list of all the commits (save points) made in the repository. It is the "history book" of your project.
+
+What it shows:
+
+• Commit Hash: A unique 40-character ID for each commit.
+
+• Author: The name and email of the person in git [set by git.config --global command] who made the change.
+
+• Date: The exact timestamp of the commit.
+
+• Commit Message: The description provided using the `-m` flag.
+
+Common Variations:
+
+• `git log`: Shows the full detailed history.
+
+• `git log --oneline`: Condenses each commit into a single line (ID and message only).
+
+• `git log -p`: Shows the actual code changes (patches) made in each commit.
+
+ex-: 
+To see the "receipt" of this save point, you use the `git log` command:
+
+(base) C:\Users\Omkar Raut\Desktop\DataSceince>git log
+commit 5a154239aae0786720d3a13b35d31a87eaa2a7b1 (HEAD -> master)
+Author: omkar454 <omraut41105@gmail.com>
+Date:   Thu Mar 26 15:48:35 2026 +0530
+
+    testing
+
+(base) C:\Users\Omkar Raut\Desktop\DataSceince>
+    
+
+    
+    ### Key Parts of the Log:
+    * **Commit Hash:** The long string of numbers/letters (ID) that uniquely identifies this specific version.
+    * **Author:** The name and email you set up earlier using `git config`.
+    * **Date:** Exactly when the "snapshot" was taken.
+    * **Message:** The description you wrote after the `-m` flag.
+
+
+    ### **Git Branch Command**
+
+What are Branches?
+Branches are pointers to a specific snapshot of your work, allowing you to deviate from the main line of development without affecting the main code.
+
+In Git (Local): Branches live on your computer and are used to privately test ideas or build features.
+
+On GitHub (Remote): Branches allow you to share those specific features with a team. They are the basis for Pull Requests, where others review your code before it gets merged into the main project.
+
+* **What it does:**
+    Manages the different "parallel universes" of your project, allowing you to work on new features or fixes without affecting the stable version (usually `main`).
+
+* **Common Usage:**
+    * `git branch`: Lists all local branches (the current one is marked with an asterisk `*`).
+    * `git branch <name>`: Creates a new branch.
+    * `git branch -d <name>`: Deletes a branch that has already been merged.
+    * `git branch -M <name>`: Renames the current branch (like renaming `master` to `main`).
+
+* **Key Concept:**
+    Branching is essential for team collaboration, so multiple people can work on different parts of the code at the same time and can later merge all the branches into the single "main" branch .i.e. actual branch where your actual stable version of applicaton code exists.
+
+ex-:
+(base) C:\Users\Omkar Raut\Desktop\DataSceince>git branch
+* master
+
+(base) C:\Users\Omkar Raut\Desktop\DataSceince>git branch -M main
+
+(base) C:\Users\Omkar Raut\Desktop\DataSceince>git branch        
+* main
+
+(base) C:\Users\Omkar Raut\Desktop\DataSceince>
+
+* Git Remote Command
+
+What it does: Manages the connections between your local repository and remote repositories (like GitHub). It tells Git where to send your code when you push.
+
+Common Usage:
+
+• `git remote`: Lists the names of the remotes you have connected.
+
+• `git remote -v`: Shows the actual URLs (GitHub links) for fetching and pushing.
+
+• `git remote add <name> `: Connects your local project to a new remote repository.
+
+• `git remote rm <name>`: Removes the connection to a specific remote.
+
+• `git remote rename <old-name> <new-name>` - To rename an existing remote connection (for example, changing it from old-name to origin)
+
+Key Concept: The default name for your main remote repository is almost always origin. This acts as the bridge between your computer and the cloud.
+Important Note: When using `git remote add`, you must include both the name (e.g., origin) and the URL (the link to your GitHub repo). If you omit the URL, Git will simply show the "usage" help text and won't save the connection.
+
+ex-:
+(base) C:\Users\Omkar Raut\Desktop\DataSceince>git remote add  main https://github.com/omkar45
+4/DataScience-Learning-Journey.git
+
+(base) C:\Users\Omkar Raut\Desktop\DataSceince>git remote
+main
+
+(base) C:\Users\Omkar Raut\Desktop\DataSceince>git remote rename main origin
+
+(base) C:\Users\Omkar Raut\Desktop\DataSceince>git remote
+origin
+
+(base) C:\Users\Omkar Raut\Desktop\DataSceince>git remote -v
+origin  https://github.com/omkar454/DataScience-Learning-Journey.git (fetch)
+origin  https://github.com/omkar454/DataScience-Learning-Journey.git (push)
+
+(base) C:\Users\Omkar Raut\Desktop\DataSceince>git status
+On branch main
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        .vscode/
+        1-PythonBasics/
+        10-Data_Analysis/
+        11-Working_With_DataBases/
+        13-MultiThreading_and_Multiprocessing/
+        14-Memory_Management/
+        15-Flask/
+        2-ControlFlow/
+        3-DataStructures/
+        4-Functions/
+        5-Modules/
+        6-File_Handling/
+        7-Exception_Handling/
+        8-Class_and_Objects/
+        9-Advance_Python_Concepts/
+        DSA/
+        DSPL_MPR/
+        Docker/
+        EDA/
+        Feature-Enginerring/
+        Git_GitHub/
+        ML_Algo_Course/
+        ML_Algorithms/
+        Statistics/
+        conda _commands.txt
+        flask-WEBX/
+        requirements.txt
+        venv1/
+
+nothing added to commit but untracked files present (use "git add" to track)
+
+(base) C:\Users\Omkar Raut\Desktop\DataSceince>
+
+## 📘 Final Note (git remote -v)
+
+```bash
+git remote -v
+```
+ex-: 
+(base) C:\Users\Omkar Raut\Desktop\DataSceince>git remote -v
+origin  https://github.com/omkar454/DataScience-Learning-Journey.git (fetch)
+origin  https://github.com/omkar454/DataScience-Learning-Journey.git (push)
+
+### 🔹 Output Meaning:
+
+* `origin` → name of remote (online) repository (GITHUB REPOSITORY) attached to your local git repo.
+* URL → GitHub repo link
+* `(fetch)` → used to **pull code**
+* `(push)` → used to **send code**
+
+## 🧠 Important Points
+
+* If no remote name is given while adding remote:
+  👉 **`origin` is used by default**
+
+* Fetch and push URLs:
+
+  * Usually same ✅
+  * Can be different (in case of forks or in general also depending on the situation)
+
+  ## ⚡ Final Idea
+👉 Local repo is connected to a remote repo (`origin`) for **pulling and pushing code** 🚀
+
+* Git Push Command
+
+What it does: Uploads your local repository commits (the "save points" on your computer) to a remote repository (like GitHub).
+
+Common Usage:
+
+• `git push <remote> <branch>`: Sends changes from a specific local branch to a specific remote.
+
+• `git push origin main`: The most common command; sends your `main` branch changes to the `origin` remote on GitHub.
+
+• `git push -u origin main`: Uploads your changes and sets the "upstream" tracking, so in the future, you can just type `git push`.
+
+• `git push --force`: Overwrites the remote history with your local history (use with extreme caution!).
+
+Important Note: Before you can `push`, you must have committed your changes locally. You cannot push "staged" files that haven't been committed yet.
+
+Key Concept: Pushing is like "uploading" or "syncing" your work to the cloud so your team can see it and you have a backup.
+Which local branch gets pushed?
+
+By default, `git push origin main` pushes code from your current local branch to the `main` branch on GitHub.
+
+1. If you are on the local main branch: It takes your local `main` commits and sends them to the GitHub `main`. This is the standard, safest way to work.
+
+2. If you are on a different local branch (e.g., feature-login): If you run `git push origin main`, Git will try to push code from `feature-login` into the remote `main`.
+
+• The Danger: You might accidentally overwrite "perfect" code with "work-in-progress" code.
+
+The "Safe" Golden Rule: Always match your names. If you are on a local branch called `dev`, push it to a branch called `dev` on GITHUB:
+
+• Correct way: `git push origin dev`
+
+• Shortcut: Use `git push` (if you used the `-u` flag earlier).
+
+How to check where you are standing: Run `git branch`. The one with the asterisk (*) and the green color is your current local branch and by using "git push" command "git" will try to push current local branch which is already commited to the specified "remote branch"(GITHUB BRANCH) in `git push` command
+
+ex-:
+
+(base) C:\Users\Omkar Raut\Desktop\DataSceince>git push origin main
+Enumerating objects: 14, done.
+Counting objects: 100% (14/14), done.
+Delta compression using up to 4 threads
+Compressing objects: 100% (13/13), done.
+Writing objects: 100% (14/14), 4.30 KiB | 734.00 KiB/s, done.
+Total 14 (delta 0), reused 0 (delta 0), pack-reused 0 (from 0)
+To https://github.com/omkar454/DataScience-Learning-Journey.git
+ * [new branch]      main -> main
+
+(base) C:\Users\Omkar Raut\Desktop\DataSceince>
+
+* Git Restore Command
+What it does: Helps you undo changes in your working directory or unstage files. It is the modern, safer way to "discard" changes you haven't committed yet.
+
+Common Usage:
+
+• `git restore <file>`: Discards local changes in a file and restores it to the last committed state. (The "Undo" button for your code).
+
+• `git restore --staged <file>`: Unstages a file (removes it from the `git add` area) but keeps your actual code changes intact.
+
+• `git restore .`: Discards all local changes in the current directory.
+
+Key Concept: `git restore` is specifically for your working tree (files you are editing) and the index (staged files). It does not delete your commit history; it just cleans up your current workspace.
+
+Important Warning: Running `git restore <file>` will permanently delete any uncommitted changes in that file. There is no "undo" for this action!
+Real-World Example: Resetting to "Pushed" Status
+
+Imagine you have already pushed your project to GitHub, and your local workspace is clean.
+
+1. The Change: You open `script.py` and delete 10 lines of code by mistake.
+
+2. The Status: You run `git status`. It shows:
+
+  • `modified: script.py`
+
+  • (Changes not staged for commit).
+
+3. The Action: You want to go back to exactly how the file looked when you last committed.
+
+  • Command: `git restore script.py`
+
+4. The Result: Your deleted lines are back! If you run `git status` again, it shows:
+
+  • `nothing to commit, working tree clean`
+
+  • Your local file now perfectly matches the "Pushed" status on GitHub.
+CRITICAL CLARIFICATION: Commit vs. Push
+
+• Restores From: Your most recent local COMMIT (the last time you ran `git commit`).
+
+• Does NOT Restore From: Your last PUSH on GitHub.
+
+Key Takeaway:
+ `git restore` uses your local `.git` folder and does not need the internet. It resets your file to the last "save point" .i.e. last(latest) COMMIT you created on your own computer, even if you haven't sent those changes to GitHub yet.
+
+  ex-:
+
+  (base) C:\Users\Omkar Raut\Desktop\DataSceince>git status
+On branch main
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   12-Logging/app.py
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        .vscode/
+        1-PythonBasics/
+        10-Data_Analysis/
+        11-Working_With_DataBases/
+        13-MultiThreading_and_Multiprocessing/
+        14-Memory_Management/
+        15-Flask/
+        2-ControlFlow/
+        3-DataStructures/
+        4-Functions/
+        5-Modules/
+        6-File_Handling/
+        7-Exception_Handling/
+        8-Class_and_Objects/
+        9-Advance_Python_Concepts/
+        DSA/
+        DSPL_MPR/
+        Docker/
+        EDA/
+        Feature-Enginerring/
+        Git_GitHub/
+        ML_Algo_Course/
+        ML_Algorithms/
+        Statistics/
+        conda _commands.txt
+        flask-WEBX/
+        requirements.txt
+        venv1/
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+(base) C:\Users\Omkar Raut\Desktop\DataSceince>git restore 12-Logging/app.py
+
+(base) C:\Users\Omkar Raut\Desktop\DataSceince>git status
+On branch main
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        .vscode/
+        1-PythonBasics/
+        10-Data_Analysis/
+        11-Working_With_DataBases/
+        13-MultiThreading_and_Multiprocessing/
+        14-Memory_Management/
+        15-Flask/
+        2-ControlFlow/
+        3-DataStructures/
+        4-Functions/
+        5-Modules/
+        6-File_Handling/
+        7-Exception_Handling/
+        8-Class_and_Objects/
+        9-Advance_Python_Concepts/
+        DSA/
+        DSPL_MPR/
+        Docker/
+        EDA/
+        Feature-Enginerring/
+        Git_GitHub/
+        ML_Algo_Course/
+        ML_Algorithms/
+        Statistics/
+        conda _commands.txt
+        flask-WEBX/
+        requirements.txt
+        venv1/
+
+nothing added to commit but untracked files present (use "git add" to track)
+
+(base) C:\Users\Omkar Raut\Desktop\DataSceince>
+
+* SIMULATION of "git restore" command-:
+
+This is a perfect way to visualize it. Imagine you have a file called `app.py` that is already part of your Git history.
+
+### **The Simulation**
+
+#### **Step 1: Your starting point (The "Safe" State)**
+Your file `app.py` looks like this and has already been **COMMITED**:
+```python
+def login():
+    print("Login successful!")
+
+login()
+```
+
+---
+
+#### **Step 2: You make a mistake (The "Dirty" State)**
+You accidentally delete the function and write some broken code:
+```python
+# Oh no! I deleted the login function by mistake
+print("This code is broken...")
+```
+You run `git status`:
+> `modified: app.py`  
+> *(Changes not staged for commit)*
+
+---
+
+#### **Step 3: The Restore Command**
+You realize the mistake and want to go back to the version you last commited.
+```
+git restore app.py
+```
+
+
+---
+
+#### **Step 4: The Result (The "Restored" State)**
+You open `app.py` again, and magically, your original code is back exactly as it was:
+```python
+def login():
+    print("Login successful!")
+
+login()
+```
+You run `git status` again:
+> `nothing to commit, working tree clean`
+
+---
+
+### **Summary of what happened:**
+Git looked at your hidden `.git` folder, found the last "snapshot" (commit) of `app.py`, and **overwrote** your broken local version with that perfect copy.
+
+* 👉 "git restore"restores file from last commit, not from GitHub push
+
+
+* Git Clone Command
+
+What it does: Creates a complete copy of an existing remote repository (from GitHub) and downloads it to your local computer. It’s like downloading a project folder, but it also includes the entire history of the project.
+
+Common Usage:
+
+• git clone <url>: Downloads the repository into a folder named after the project (.i.e. repo-name in GITHUB) in cwd.
+
+• git clone <url> <folder-name>: Downloads the repository into a specific folder name of your choice. 
+
+Key Concept: When you `clone`, Git automatically:
+
+1. Creates a new folder for you.
+
+2. Initializes it as a Git repository.
+
+3. Sets up a remote named origin  pointing to the GitHub URL.
+
+4. Downloads all files and the entire commit history.
+
+Important Note: You only need to run `clone` once per project. After that, you use `git pull` to get new updates.
+
+Clone vs. Download ZIP: Unlike "Download ZIP" on GitHub, `git clone` keeps the connection to the remote server, allowing you to push and pull changes later.
+CRITICAL DIFFERENCE: Clone vs. Download ZIP
+
+• Download ZIP: This is a "one-time" snapshot. It will NOT keep the connection to the remote origin or branches. It is a completely independent folder with no Git history. You cannot `push` or `pull` from it.
+
+• Git Clone: This keeps a permanent connection to the remote server. Because it preserves the link to the origin and all branches, it allows you to `push` your changes back to GitHub and `pull` new updates later.
+Can you clone without a URL?
+
+Rule: You always need a source to clone from. Git must know what it is copying.
+
+• Remote: Use a URL (GitHub/GitLab).
+
+• Local: Use a file path (another folder on your PC).
+
+  • Example: `git clone /path/to/old-folder new-folder` (No internet needed!)
+
+Note: If you type `git clone` by itself, Git will show an error: fatal: You must specify a repository to clone.
+Important Requirement for Local Cloning: When cloning from a local path (e.g., `git clone /path/to/old-folder`), the old-folder MUST already be a Git repository (meaning it must have been initialized with `git init` or previously cloned). You cannot "clone" a regular folder that doesn't have a `.git` history.
+Does clone create a new folder?
+
+• Standard Behavior: Yes, Git always tries to create a new folder.
+
+• If the folder already exists: Git will NOT overwrite it. Instead, it will give you an error: `fatal: destination path 'folder-name' already exists and is not an empty directory.`
+
+• Cloning into an existing folder: You can only clone into an existing folder if that folder is completely empty. Even then, Git will not "overwrite" files; it will simply place the repository inside that empty space.
+
+Key Takeaway: Git protects your data by refusing to clone into a folder that already contains files.
+Is the remote name always 'origin'?
+
+• Default Behavior: Yes, by default, `git clone` automatically names the connection to the remote repository "origin".
+
+• Can you change it? Yes. If you want a different name (like "github" or "source"), you can use the `-o` or `--origin` flag during cloning.
+
+  • Example: `git clone -o github `
+
+  • This will name the remote "github" instead of the default "origin".
+
+Key Takeaway: While "origin" is the industry standard and Git's default, it is just a nickname. You can customize it if needed.
+Cloning into an existing folder
+
+• The Rule: You can clone into an existing folder ONLY if it is completely empty.
+
+• The Error: If there is even one file (like a `README.txt` or a hidden file) in that folder, Git will stop and say: `fatal: destination path 'folder-name' already exists and is not an empty directory.`
+
+• How to do it: 
+To clone into your current empty folder/directory, use a dot: `git clone  .`
+
+Summary: If the folder has any content, Git will refuse to clone there to prevent overwriting your existing work.
+
+ex-: 
+(base) C:\Users\Omkar Raut\Desktop>git clone https://github.com/omkar454/DataScience-Learning-Journey
+Cloning into 'DataScience-Learning-Journey'...
+remote: Enumerating objects: 14, done.
+remote: Counting objects: 100% (14/14), done.
+remote: Compressing objects: 100% (13/13), done.
+remote: Total 14 (delta 0), reused 14 (delta 0), pack-reused 0 (from 0)
+Receiving objects: 100% (14/14), 4.30 KiB | 93.00 KiB/s, done.
+
+(base) C:\Users\Omkar Raut\Desktop>cd DataScience-Learning-Journey
+
+(base) C:\Users\Omkar Raut\Desktop\DataScience-Learning-Journey>git remote -v                 
+origin  https://github.com/omkar454/DataScience-Learning-Journey (fetch)
+origin  https://github.com/omkar454/DataScience-Learning-Journey (push)
+
+(base) C:\Users\Omkar Raut\Desktop\DataScience-Learning-Journey>git branch
+* main
+
+(base) C:\Users\Omkar Raut\Desktop\DataScience-Learning-Journey>git status
+On branch main
+Your branch is up to date with 'origin/main'.
+
+nothing to commit, working tree clean
+
+* PERFORMED SOME CHANGES IN THE CLONED REPO. . SO; "git status" command O/P changes as shown below-:
+
+(base) C:\Users\Omkar Raut\Desktop\DataScience-Learning-Journey>git status
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        tester/
+
+nothing added to commit but untracked files present (use "git add" to track)
+
+
+* Since the remote connection is the same (i.e., the GitHub URLs for both fetch and pull are identical) in both cloned repo and actual local repo of that GITHUB Repo., any changes pushed from this cloned repository will directly update the shared GitHub repository, thereby affecting both the original local repository and the cloned repository-:
+
+(base) C:\Users\Omkar Raut\Desktop\DataScience-Learning-Journey>git add .
+
+(base) C:\Users\Omkar Raut\Desktop\DataScience-Learning-Journey>git status
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+        new file:   tester/test.txt
+
+
+(base) C:\Users\Omkar Raut\Desktop\DataScience-Learning-Journey>git commit -m "commiting from clone repo"
+[main fec50c0] commiting from clone repo
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 tester/test.txt
+
+(base) C:\Users\Omkar Raut\Desktop\DataScience-Learning-Journey>git status                    
+On branch main
+Your branch is ahead of 'origin/main' by 1 commit.
+  (use "git push" to publish your local commits)
+
+nothing to commit, working tree clean
+
+(base) C:\Users\Omkar Raut\Desktop\DataScience-Learning-Journey>git branch
+* main
+
+
+
+(base) C:\Users\Omkar Raut\Desktop\DataScience-Learning-Journey>git push origin main
+Enumerating objects: 5, done.
+Counting objects: 100% (5/5), done.
+Delta compression using up to 4 threads
+Compressing objects: 100% (2/2), done.
+Writing objects: 100% (4/4), 321 bytes | 160.00 KiB/s, done.
+Total 4 (delta 0), reused 0 (delta 0), pack-reused 0 (from 0)
+To https://github.com/omkar454/DataScience-Learning-Journey
+   5a15423..fec50c0  main -> main
+
+(base) C:\Users\Omkar Raut\Desktop\DataScience-Learning-Journey>git config --get credential.helper
+manager
+
+(base) C:\Users\Omkar Raut\Desktop\DataScience-Learning-Journey>
+
+
+
+## **Git Push Credentials: The Complete Breakdown**
+
+### **Does `git push` always ask for a password?**
+**No.** While Git *always* needs to verify your identity to let you upload code, it does not always ask you to type it in.
+
+---
+
+### **1. When will it ASK?**
+It will ask for your credentials in these specific cases:
+* **First time:** When you are pushing to a new GitHub account on a fresh computer.
+* **Credentials Expired:** If your login "token" has timed out or been revoked.
+* **No Helper:** If your computer isn't set up to "remember" logins (no Credential Manager).
+* **Manual Login:** If you are using a Personal Access Token (PAT) and haven't saved it yet.
+
+---
+
+### **2. When it ASKS: What do I enter?**
+If the terminal prompts you for a "Password," **do not enter your GitHub website password.** GitHub disabled this in 2021 for security. Instead:
+
+* **The Browser Pop-up (Recommended):** Most modern Git installs will open a window. Click **"Sign in with your browser."** You just click "Authorize" in your browser tab, and you are done.
+* **Personal Access Token (PAT):** If the terminal asks for a password and no window pops up, you must enter a **PAT**.
+    * **To get one:** GitHub Settings → Developer Settings → Personal Access Tokens → Tokens (classic) → Generate New Token.
+    * **To use it:** Copy the long code and paste it into the terminal when it asks for your "Password." (Note: The terminal won't show characters while you paste/type for security).
+
+
+    ### **3. When will it NOT ask? (The GCM / Manager)**
+It will **not** ask if your computer is using a **Credential Helper**.
+* **The "Manager":** If you run `git config --get credential.helper` and it says `manager`, your computer is using **Git Credential Manager (GCM)**.
+* **The Vault:** GCM saves your GitHub "ID badge" (token) inside the **Windows Credential Manager** (a secure vault on your PC).
+* **Automatic Handshake:** Every time you `push`, GCM automatically grabs that badge from the vault and shows it to GitHub. It happens in the background so you never see a password prompt.
+
+ex-:
+(base) C:\Users\Omkar Raut\Desktop\DataScience-Learning-Journey>git config --get credential.helper
+manager
+
+### **4. `git config` vs. Credentials (The Big Difference)**
+It is easy to confuse these two, but they do completely different things:
+
+| Feature | `git config user.name` | **Git Credentials** |
+| :--- | :--- | :--- |
+| **Purpose** | **Identity (The Signature)** | **Security (The Key)** |
+| **Analogy** | Signing your name at the bottom of a letter. | Using a key to unlock the post office box. |
+| **Effect** | Tells GitHub whose name to show in history. | Proves you have permission to upload code. |
+| **Requirement** | Does **NOT** need a password. | Requires a **PAT** or **Browser Login**. |
+
+### **5. How to ACCESS/Find your "Saved" Password on Windows**
+If Git isn't asking you for a password and you want to see where it's stored or delete it (e.g., to switch accounts):
+
+1.  Open the **Windows Start Menu**.
+2.  Search for **"Credential Manager"** and open it.
+3.  Click on the **Windows Credentials** tab.
+4.  Scroll down to the **Generic Credentials** section.
+5.  Look for an entry named **`git:https://github.com`**.
+6.  Click the arrow to expand it. You can see the user name and **Remove** or **Edit** the saved token/password there.

@@ -1,0 +1,688 @@
+## 📝 Usage of Dockerfile in an Application
+
+### 🔹 What is a Dockerfile?
+
+👉 A Dockerfile is a **text file with instructions** to create a Docker image
+
+### 🔹 Usage / Purpose
+
+#### 1. Automates Image Creation
+
+* Defines how your application image should be built
+
+#### 2. Sets Up Environment
+
+* Installs dependencies (libraries, packages)
+* Configures system settings
+
+#### 3. Adds Application Code
+
+* Copies your app files into the image
+
+#### 4. Defines How App Runs
+
+* Specifies the command to start the application
+
+---
+
+### 🔹 Why It is Important
+
+* Ensures **same setup everywhere**
+* Avoids “works on my machine” problem
+* Makes deployment easy and consistent
+
+---
+
+### 🔹 One Line Summary
+👉 Dockerfile is used to **automatically build a Docker image with all setup needed to run an application**
+
+** Example of DockeFile Content-:
+
+FROM python:3.8-alpine
+"python:3.8-alpine -: linux based image of python available in DOCKER HUB.
+So; FROM command will pull this image from DOCKER-HUB and install this IMAGE as BASE-LAYER for OUR APPLICATION IMAGE"
+COPY . /app
+WORKDIR /app
+RUN  pip install -r requirements.txt
+CMD ["python", "app.py"]
+
+
+# #  DOCKERFILE COMMANDS NOTES-:
+# # ## 📝 Dockerfile + Base Image Selection (Final Combined Notes)
+
+# # ---
+
+# # ## 🔹 What is a Dockerfile?
+
+# # 👉 A Dockerfile is a **set of instructions** used to build a Docker image for your application
+
+# # ---
+
+# # ## 📝 Dockerfile Commands (Detailed Notes)
+
+
+# # ### 🔹 1. `FROM`
+
+# # 👉 Defines the **base image** on which your application will run
+
+# # * It is the **starting point** of your Docker image
+# # * All other instructions build on top of this
+# # * Think of it like choosing an **environment** .i.e. BASE LAYER for the ENTIRE IMAGE OF YOUR APPLICATION
+
+# # 📌 Example:
+
+# # ```dockerfile
+# # FROM python:3.9
+# # ```
+
+# # 👉 Uses Python 3.9 environment
+
+# # ---
+
+# ## 📝 Running Containers on Windows (Notes)
+
+# ---
+
+# ### 🔹 Host OS
+
+# 👉 Your system uses **Windows OS kernel**
+
+# ---
+
+# ### 🔹 What Can You Run?
+
+# 👉 You can run:
+
+# * ✅ Linux containers
+# * ✅ Windows containers
+
+# ---
+
+# ### 🔹 Default Setup (Most Common)
+
+# * Docker Desktop uses **WSL2 (Windows Subsystem for Linux)**
+# * This allows running **Linux containers on Windows**
+
+# 📌 Example:
+
+# ```bash
+# FROM python:3.9
+# ```
+
+# ---
+
+# ### 🔹 Windows Containers
+
+# * You can also run Windows-based containers
+
+# 📌 Example:
+
+# FROM mcr.microsoft.com/windows/servercore
+
+# ### 🔹 Important Point ⚠️
+
+# * You can run **only one type at a time**:
+
+#   * Linux containers OR Windows containers
+
+# ---
+
+# ### 🔹 One Line Summary
+
+# 👉 On Windows, Docker usually runs **Linux containers using WSL2**, but Windows containers can also be used if switched manually
+
+#  📝 Why Linux-Based Images Are Generally Preferred as Base-Layer or BASE IMAGE in "FROM" command as compared to Windows-Based Images
+
+
+# ### 🔹 Main Reason
+
+# 👉 Linux images are **lightweight, fast, and widely supported**
+
+# ---
+
+# ### 🔹 Reasons
+
+# #### 1. Lightweight
+
+# * Smaller in size
+# * Faster to download and build
+
+# ---
+
+# #### 2. Better Performance
+
+# * Uses fewer resources
+# * Starts containers quickly
+
+# ---
+
+# #### 3. Wide Support
+
+# * Most Docker images are **Linux-based**
+# * Better community support and documentation
+
+# ---
+
+# #### 4. Compatibility
+
+# * Works smoothly with Docker (Docker was originally built for Linux). So; majority times u will only use Linux based images as base-layer for your application images as -: Docker was originally built for Linux ONLY.
+
+# ---
+
+# #### 5. Easy to Use
+
+# * Simple setup and fewer issues compared to Windows containers
+
+# ---
+
+# ### 🔹 One Line Summary
+
+# 👉 Linux-based images are preferred because they are **lightweight, fast, and more compatible with Docker**
+
+
+
+# # ### 🔹 2. `COPY`
+
+# # 👉 Copies files from your **local system → Docker image**
+
+# # * Used to add your application code into the container
+# # * First path = source (your system)
+# # * Second path = destination (inside container)
+
+# # 📌 Example:
+
+# # ```dockerfile
+# # COPY . /app
+# # ```
+
+# # 👉 Copies all files into `/app` folder
+
+# # ---
+
+# # ### 🔹 3. `WORKDIR`
+
+# # 👉 Sets the **working directory** inside the container
+
+# # * All next commands will run from this folder
+# # * Similar to `cd` command
+
+# # 📌 Example:
+
+# # ```dockerfile
+# # WORKDIR /app
+# # ```
+
+# # 👉 Now container works inside `/app`
+
+# # ---
+
+# # ### 🔹 4. `RUN`
+
+# # 👉 Executes commands **during image build**
+
+# # * Used to install dependencies and tools
+# # * Runs only once while building image
+
+# # 📌 Example:
+
+# # ```dockerfile
+# # RUN pip install -r requirements.txt
+# # ```
+
+# # 👉 Installs required libraries
+
+# # ---
+
+# # ### 🔹 5. `CMD`
+
+# # 👉 Defines the **default command when container starts**
+
+# # * Starts your application
+# # * Runs only when a container is started. This command is not executed at image build time; it runs only when the image is used and is running to create and start a container.
+
+# # 📌 Example:
+
+# # ```dockerfile
+# # CMD ["python", "app.py"]
+# # ```
+
+# # 👉 Starts the app
+
+# # ---
+
+# # ## 🔹 Simple Flow (How It Works)
+
+# # 1. `FROM` → Choose environment
+# # 2. `COPY` → Add code
+# # 3. `WORKDIR` → Set directory
+# # 4. `RUN` → Install dependencies
+# # 5. `CMD` → Start application
+
+# # ---
+
+# # ## 📝 Why Use `python:3.9` Instead of Windows
+
+# # ---
+
+# # ### 🔹 Main Idea
+
+# # 👉 In Docker, we use a **lightweight environment with required tools**, not a full OS
+
+# # ---
+
+# # ### 🔹 Key Reason ⭐
+
+# # 👉 Containers **share the same OS kernel of the host system**. So; all containers will by-default use the same HOST OS Kernel.
+
+# # So; NO NEED of using "WINDOWS" image as Base image. Just use "PYTHON" image as base image as that is required and necessary and LIGHTWEIGHT and also sensible reason also.
+
+# # * No need to install full OS inside container
+# # * Only required tools (like Python) are needed
+
+# # ---
+
+# # ### 🔹 Why NOT Windows ❌
+
+# # * Very **large and heavy**
+# # * Slower to download and run
+# # * Not required for simple applications
+# # * Full OS is unnecessary in containers
+
+# # ---
+
+# # ### 🔹 Why Python Image (`python:3.9`) ✅
+
+# # * Already has **Python installed**
+# # * Lightweight and optimized
+# # * Faster to build and run
+# # * Best suited for Python apps
+
+# # ---
+
+# # ### 🔹 Simple Analogy
+
+# # * Windows = Full computer 🖥️ (heavy)
+# # * `python:3.9` = Ready-made workspace 🧰 (light + efficient)
+
+# # ---
+
+# # ## 🔹 Final One Line Summary
+
+# # 👉 Dockerfile defines how to **build and run your application**, and since containers **share the OS kernel**, we use lightweight images like `python:3.9` instead of heavy OS like Windows as containers  **share the same HOST OS kernel**, 
+
+
+* DOCKER CLI COMMAND TO BUILD IMAGE FOR OUR APPLICATION VIA DOCKERFILE-:
+
+## 📝 `docker build -t` Command (Final Detailed Notes)
+
+### 🔹 Command
+
+```
+docker build -t <image_name>:<tag> .
+```
+
+---
+
+## 🔹 What This Command Does
+
+👉 It **creates a Docker image** using the **Dockerfile and application files** present in a folder
+
+---
+
+## 🔹 Step-by-Step Explanation
+
+### 🔸 1. `docker build`
+
+👉 Tells Docker to **build (create) an image**
+
+* Reads instructions from the **Dockerfile**
+* Executes commands like `FROM`, `COPY`, `RUN`, `CMD`
+
+---
+
+### 🔸 2. `-t` (tag)
+
+👉 Used to **give a name and version** to the image
+
+* Format:
+
+```
+<image_name>:<tag>
+```
+
+📌 Example:
+
+```
+myapp:1.0
+```
+
+* `myapp` → image name
+* `1.0` → version
+
+---
+
+### 🔸 3. `.` (dot)
+
+👉 Means **current directory**
+
+* Docker will look inside this folder for:
+
+  * `Dockerfile`
+  * **Application files (code, requirements, etc.)**
+
+---
+
+## 🔹 Important Points ⭐
+
+### ✅ Application Files Location
+
+👉 Your **application files must be in the same folder as the Dockerfile**
+
+* So that commands like:
+
+  * `COPY`
+  * `WORKDIR`
+  * `RUN`
+    👉 work properly
+
+---
+
+### ✅ Default Tag
+
+👉 If no tag/version is given → Docker assigns **`latest` by default**
+
+📌 Example:
+
+```bash
+docker build -t myapp .
+```
+
+➡️ Same as:
+
+```bash 
+docker build -t myapp:latest .
+```
+
+---
+
+## 🔹 Example
+
+```bash 
+docker build -t myapp:1.0 .
+```
+
+👉 What happens internally:
+
+1. Docker reads **Dockerfile**
+2. Copies application files
+3. Installs dependencies
+4. Builds image
+5. Names it `myapp:1.0`
+
+---
+
+## 🔹 Simple Understanding 🧠
+
+👉 “Go to this folder, take my Dockerfile + app files, build image, and name it properly”
+
+---
+
+## 🔹 When Do We Use It?
+
+* After writing Dockerfile
+* Before running container
+
+---
+
+### 🔹 One Line Summary
+
+👉 `docker build -t` builds and names a Docker image using **Dockerfile + application files from the current folder**, and assigns **`latest` tag by default if not specified**
+
+ex-:
+(base) C:\Users\Omkar Raut\Desktop\DataSceince\Docker\Hello World>docker build -t welcome-app .
+* this below image getting pulled from docker-hub and installing in our device is of : python:3.9 linux-based image as base-layer for "welcome-app" image for our flask application
+[+] Building 133.8s (9/9) FINISHED                                       docker:desktop-linux
+ => [internal] load build definition from Dockerfile                                     0.1s
+ => => transferring dockerfile: 140B                                                     0.0s
+ => [internal] load metadata for docker.io/library/python:3.9                            2.7s
+ => [internal] load .dockerignore                                                        0.0s
+ => => transferring context: 2B                                                          0.0s
+ => [internal] load build context                                                        0.1s
+ => => transferring context: 225B                                                        0.0s
+ => [1/4] FROM docker.io/library/python:3.9@sha256:da5aee29682d12a6649f51c8d6f15b87deb  76.3s
+ => => resolve docker.io/library/python:3.9@sha256:da5aee29682d12a6649f51c8d6f15b87deb3  0.0s
+ => => sha256:91c91c91f1d23f4edf4280a8fe935f14340fec43a7a3576149a7cffcf70c2 250B / 250B  0.6s
+ => => sha256:c9723aa529b03c40e66d0aee927a410b4719528ab865af6e0bac1b7 20.37MB / 20.37MB  5.7s
+ => => sha256:79d5bd8a8d262418bf22e705535ce38c6789dc72e319d76b30aa 235.93MB / 235.93MB  59.1s
+ => => sha256:081ccf923272c30c6072c6ff1617d9072e03ab2a90a431951d325d45e 6.10MB / 6.10MB  5.3s
+ => => sha256:26dfe2fac1c486e9aaf41d1028ed30be2c442aa84af44462bc7bac 67.78MB / 67.78MB  32.2s
+ => => sha256:89d573bf42b377ce6a5a0451c15388849686fa4058efd68999f3b01 25.62MB / 25.62MB  7.6s
+ => => sha256:795dbedde24d2c72dafd2b71fe36643552e56859c0e29cdb095ed5 49.28MB / 49.28MB  26.2s
+ => => extracting sha256:795dbedde24d2c72dafd2b71fe36643552e56859c0e29cdb095ed54b825fba  5.4s
+ => => extracting sha256:89d573bf42b377ce6a5a0451c15388849686fa4058efd68999f3b014daeb5b  2.7s
+ => => extracting sha256:26dfe2fac1c486e9aaf41d1028ed30be2c442aa84af44462bc7bac8c148ffb  8.5s
+ => => extracting sha256:79d5bd8a8d262418bf22e705535ce38c6789dc72e319d76b30aafa5c331b6  11.1s
+ => => extracting sha256:081ccf923272c30c6072c6ff1617d9072e03ab2a90a431951d325d45e29696  0.4s
+ => => extracting sha256:c9723aa529b03c40e66d0aee927a410b4719528ab865af6e0bac1b7c9b1082  5.0s
+ => => extracting sha256:91c91c91f1d23f4edf4280a8fe935f14340fec43a7a3576149a7cffcf70c2f  0.1s
+ * ------------------------------------------------------------------------------------------------------------------------------
+ => [2/4] COPY . /app                                                                    6.4s
+ => [3/4] WORKDIR /app                                                                   1.3s 
+ => [4/4] RUN  pip install -r requirements.txt                                          32.0s 
+ => exporting to image                                                                  14.3s 
+ => => exporting layers                                                                 10.6s 
+ => => exporting manifest sha256:85c351865ab544ccd951bc8c854d49b0dca38a35b2e690c9e0662e  0.1s 
+ => => exporting config sha256:e1de9dfd3bf40852bb459b6b6bb0a99b45cd408493c36a5dd4a9189b  0.0s 
+ => => exporting attestation manifest sha256:6d2a2cdd611d4be8aa8f5986036a880335d97fb852  0.1s 
+ => => exporting manifest list sha256:c0f4ab7c25613f91c91f228d90650effdf7678cc2eed3e828  0.0s 
+ => => naming to docker.io/library/welcome-app:latest                                    0.0s 
+ => => unpacking to docker.io/library/welcome-app:latest                                 3.3s 
+
+ 1 warning found (use docker --debug to expand):
+ - JSONArgsRecommended: JSON arguments recommended for CMD to prevent unintended behavior related to OS signals (line 5)
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/zrb3a2ygvpcknmnm7n9cztzng
+
+
+(base) C:\Users\Omkar Raut\Desktop\DataSceince\Docker\Hello World>docker images
+REPOSITORY    TAG       IMAGE ID       CREATED         SIZE
+welcome-app   latest    c0f4ab7c2561   2 minutes ago   1.86GB
+hello-world   latest    85404b3c5395   7 months ago    20.3kB
+
+(base) C:\Users\Omkar Raut\Desktop\DataSceince\Docker\Hello World>
+
+* DOCKER COMMAND TO RUN IMAGE WHICH WAS CREATED FOR OUR APPLICATION-:
+in app.py we wrote-: "app.run(host="0.0.0.0",port=5000)". So; container-port = "5000" and it is fixed by us within the image now.
+But; HOST-PORT can be randomly set according to us.
+So; CONTAINER IS CREATED via "DOCKER RUN" COMMAND
+
+ex-:
+# host-port = 5000; container-port = 5000-:
+(base) C:\Users\Omkar Raut\Desktop\DataSceince\Docker\Hello World>docker run -p 5000:5000 welcome-app
+ * Serving Flask app 'app'
+ * Debug mode: off
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.17.0.2:5000
+Press CTRL+C to quit
+
+* So; if on your local device via browser if u try to access the application running within container on this localhost IP ADDRESS:  http://127.0.0.1:5000 then your APP WILL  RUN  on your local-device
+* But; 
+* if on your local device via browser if u try to access the application running within container on this IP ADDRESS:  http://172.17.0.2:5000 then your APP WILL NOT RUN  on your local-device cause-:
+
+## 📝 Docker Container IP & Communication — Final Notes
+
+### 🔹 What is `172.17.0.2`?
+
+👉 It is the **internal IP address assigned to a Docker container**
+
+* Belongs to Docker’s **bridge (internal) network**
+* Assigned by Docker for internal communication within the container’s **isolated environment**
+* **Not meant for public usage**
+
+---
+
+### 🔹 Purpose of This IP ⭐
+
+* Allows Docker to **communicate with the application inside the container** using this IP assigned by it.
+* Supports **internal networking between containers**
+* Each container runs in an **isolated environment** with its own private IP
+
+---
+
+### 🔹 Can Docker Containers Communicate with Each Other? ✅
+
+* Yes, containers can communicate if they are on the **same Docker network**
+* Communication can happen using:
+
+  * **Internal IP** (like `172.x.x.x`)
+  * **Container name** (especially in user-defined networks)
+
+📌 Example:
+
+* Container A (Flask app) wants to connect to Container B (Database)
+
+* Flask app can use `http://containerB:port` or Container B’s IP
+
+* This is **internal communication only**, not exposed to the host or external network unless ports are mapped
+
+---
+
+### 🔹 Who Can Access This IP? ✅
+
+* Other containers on the **same Docker network**
+* Internal Docker processes
+
+---
+
+### 🔹 Who CANNOT Access This IP? ❌
+
+* Your browser (localhost)
+* Your host machine directly
+* Other devices on LAN or mobile networks
+
+---
+
+### 🔹 Correct Way to Access the App from Host ✅
+
+* Use **port mapping** when running the container:
+
+```bash
+docker run -p 5000:5000 welcome-app
+```
+
+* Host port → 5000
+* Container port → 5000
+
+Open in browser:
+
+```text
+http://localhost:5000
+```
+This localhost IP address will successfully open the application running within container on your local device.
+
+---
+
+### 🔹 Simple Understanding 🧠
+
+* `172.17.0.2` → internal Docker network (private)
+* Used for:
+
+  * Docker ↔ application communication
+  * Container ↔ container communication for containers which are within the SAME DOCKER network.
+* `localhost` → external access via mapped host port
+
+---
+
+### 🔹 One Line Summary
+
+👉 The container IP (`172.17.0.2`) is for **internal communication within Docker and between containers**, while **external access must use port mapping on the host (`localhost`)**.
+
+* So; only due to PORT-MAPPING CONCEPT local devices are able to access the application which is running within the container into their local machine by using their localhost (127.0.0.1) IP Address.
+
+## 📝 Accessing Flask App from Other Devices on Same Network
+
+---
+
+### 🔹 Main Idea
+
+👉 Other devices **can access** your Flask app running inside Docker-Container **if they are on the same network**
+
+---
+
+### 🔹 Required Conditions ⭐
+
+* Flask must run on:
+
+```python
+app.run(host="0.0.0.0", port=5000)
+```
+
+* Container must be started with port mapping:
+
+```bash
+docker run -p 5000:5000 myapp
+```
+
+---
+
+### 🔹 How Other Devices Access It
+
+👉 They use the **host machine’s IPv4 address**
+
+📌 Example:
+
+```text
+http://192.168.1.5:5000
+```
+
+* `192.168.1.5` → IP of your host system
+* `5000` → mapped port
+
+---
+
+### 🔹 Requirement for Access
+
+* Devices must be on the **same Wi-Fi / LAN network**
+
+---
+
+### 🔹 Why It Works
+
+* `0.0.0.0` → Flask listens on all network interfaces
+* Port mapping (`-p`) → exposes container port to host
+* Host IP → reachable within the same network
+
+---
+
+### 🔹 What If Not Same Network? ❌
+
+* Devices on mobile data or different networks **cannot access**
+* Because they are outside the local network
+
+### 🔹 Simple Understanding 🧠
+
+* `0.0.0.0` → allows access from any IP
+* Host IP → used by other devices to connect
+* Same network → required for connectivity
+
+---
+
+### 🔹 One Line Summary
+
+👉 Devices on the same network can access the Flask app using the **host’s IPv4 address and mapped port**, provided the app runs on `0.0.0.0`.
+
+* DOCKER COMMAND FOR STOPPING THE Running CONTAINER-:
+PS C:\Users\Omkar Raut\Desktop\DataSceince> docker ps
+CONTAINER ID   IMAGE         COMMAND                  CREATED          STATUS          PORTS                                         NAMES
+c69d67f544cd   welcome-app   "/bin/sh -c 'python …"   53 minutes ago   Up 53 minutes   0.0.0.0:5000->5000/tcp, [::]:5000->5000/tcp   intelligent_jang
+PS C:\Users\Omkar Raut\Desktop\DataSceince> docker stop c69d67f544cd
+c69d67f544cd
+PS C:\Users\Omkar Raut\Desktop\DataSceince> docker images
+REPOSITORY    TAG       IMAGE ID       CREATED             SIZE
+welcome-app   latest    c0f4ab7c2561   About an hour ago   1.86GB
+PS C:\Users\Omkar Raut\Desktop\DataSceince> 
+
+
+

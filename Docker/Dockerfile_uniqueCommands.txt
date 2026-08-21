@@ -1,0 +1,152 @@
+**`ENV` & `EXPOSE` in Dockerfile – Final Notes **
+
+## **1. `ENV` Command**
+
+### **Purpose:**
+
+* Sets **environment variables inside the container**
+* Used for configuring the application at runtime
+
+### **Syntax:**
+
+```
+ENV key=value
+```
+
+
+### **Example:**
+
+```
+ENV FLASK_APP=app.py
+ENV FLASK_ENV=development
+ENV PORT=5000
+```
+
+### **How `ENV` is Used:**
+
+* When container starts → variables are **automatically available**
+* Application can access them using:
+
+```python
+import os
+value = os.getenv("KEY")
+```
+
+### **Important Understanding (Corrected & Included):**
+
+👉 `ENV` is used to **set environment variables for the application**
+👉 These variables can be accessed using `os.getenv()` in code
+
+👉 In case of `flask run`:
+
+* Flask **automatically reads environment variables** like:
+
+  * `FLASK_APP`
+  * `FLASK_ENV`
+* And **acts accordingly** (runs correct file, sets mode, etc.)
+
+---
+
+### **Example Flow:**
+
+```
+ENV FLASK_APP=app.py
+ENV FLASK_ENV=development
+```
+
+Then:
+
+```
+flask run
+```
+
+👉 Flask will:
+
+* Run `app.py`
+* Start in development mode
+
+---
+
+### **Override at Runtime:**
+
+```
+docker run -e PORT=8000 image_name
+```
+
+* These should be no SPACES before and after "=" sign in ENV COMMANDs-:
+"
+ENV FLASK_APP=app.py => ALLOWED
+ENV FLASK_APP = app.py => NOT ALLOWED
+"
+
+## **2. `EXPOSE` Command**
+
+### **Purpose:**
+
+* Used to specify which **port the application inside container will use**
+
+---
+
+### **Syntax:**
+
+```
+EXPOSE 5000
+```
+
+---
+
+### **Example:**
+
+```
+EXPOSE 80
+```
+
+---
+
+### **How it Works:**
+
+* It acts as **documentation for developers**
+* Tells:
+  👉 “This container listens on this port”
+
+---
+
+### **Important:**
+
+* ❌ Does NOT open or publish the port
+* ✅ Only informs Docker and users
+
+---
+
+### **To Actually Access the App:**
+
+* Use port mapping:
+
+  ```
+  docker run -p 5000:5000 image_name
+  ```
+
+---
+
+## **Difference Between `ENV` and `EXPOSE`:**
+
+* `ENV` → sets **internal configuration (variables)**
+* `EXPOSE` → defines **which port app uses**
+
+---
+
+## **Simple Final Understanding:**
+
+* `ENV` → “Set values that app will use while running”
+* `EXPOSE` → “Tell which port app runs on” 🚀
+
+## 📘 Short Note
+
+* If your app runs on a **different port** than mentioned in `EXPOSE` → **no error occurs**
+* `EXPOSE` is only **documentation (hint)**, it does NOT control the app
+
+👉 But it is **recommended to keep both the same** to avoid confusion and port-mapping issues
+
+✔ Best practice:
+
+* App port = EXPOSE port = Docker port mapping

@@ -1,0 +1,992 @@
+# 📘 Final Notes: Docker Compose + Redis + Flask Integration
+
+## 1. Basic `docker-compose.yml`
+
+```yaml id="z7kq1a"
+version: "3.0"
+
+services:
+  web:
+    build: .
+    ports:
+      - "8000:5000" => PORT MAPPING to access application container from its port= 5000 on which the application is running within the container by our local device on its port = 8000
+
+  redis:
+    image: redis
+```
+
+* We can also do PORT MAPPING in docker-compose.yml Files as shown above.
+
+* In docker-compose.yml files -: INDENTATION MATTERS. So; DO PROPER INDENTATION like we do in Python Files.
+
+---
+
+## 📘 Final Note (Updated)
+
+```yaml
+services:
+  web:
+    build: .
+    image: web-app
+    ports:
+      - "8000:5000"
+
+  redis: 
+    image: redis
+```
+
+---
+
+## 🔍 For Redis
+
+👉 **No port mapping is done for Redis**
+
+* You did **NOT write `ports:`**
+* So Redis is **not exposed to your host machine**
+
+---
+
+## 🧠 What happens
+
+* Redis is available only **inside Docker network**
+* Containers communicate internally using service names
+
+```python
+host='redis'
+```
+
+---
+
+## 🔌 Access behavior
+
+| From where               | Access | How            |
+| ------------------------ | ------ | -------------- |
+| Inside container (`web`) | ✅ Yes  | `host='redis'` |
+| From your laptop         | ❌ No   | Not exposed    |
+
+---
+
+## ⚠️ Important Point (Added)
+
+👉 **If no port mapping is done:**
+
+* Only **internal container-to-container communication** works ✅
+* Docker handles communication using its **internal network**
+* No access from outside (host machine) ❌
+
+---
+
+## ⚡ Final Idea
+
+👉 No `ports` = only internal Docker communication with these containers and container to container communication within their internal Private network
+👉 Port mapping needed only for external access 🚀
+
+
+## 2. What this setup means
+
+* **web service** → your Flask application (application container)
+* **redis service** → Redis database container
+* Docker Compose:
+
+  * Creates a **shared network**
+  * Runs all services together
+  * Enables communication using **service names**
+
+---
+
+## 3. `services` (Core Concept)
+
+* Defines all containers in the application
+* Each service = one container
+* Service names are **user-defined** but must be used for communication
+
+Example:
+
+```yaml id="r9v8k2"
+services:
+  web:
+  redis:
+```
+
+---
+
+## 4. Application Container vs Other Services
+
+### ✅ Application Container
+
+* The service that contains your application code
+* Usually the one using:
+
+```yaml id="m3k2q1"
+build: .
+```
+
+👉 In this case:
+
+```yaml id="k8w2n9"
+web:
+  build: .
+```
+
+* This means:
+
+  * Docker builds an image using your **Dockerfile**
+  * Runs your Flask app inside this container
+  * build key name indicates that this container / image is created from the local Dockerfile which is present in the directory of your application folder
+ 
+👉 So:
+
+* `web` = **application container** .i.e. name of the service for application container
+
+---
+
+### 🔹 Other Services (e.g., Redis)
+
+```yaml id="v1n4t5"
+redis:
+  image: redis
+```
+
+* Uses a prebuilt image from Docker Hub
+* No Dockerfile required
+* Acts as a **dependency/service container**
+
+---
+
+## 5. `build: .` (Important Explanation)
+
+```yaml id="b3x9l7"
+web:
+  build: .
+```
+
+* Tells Docker Compose to:
+
+  * Build an image from a **Dockerfile in the current directory**
+* `.` means:
+
+  * Current folder where `docker-compose.yml` exists
+
+👉 Used when:
+
+* You have your own application code (Flask app)
+
+---
+
+## 6. Service Name = Hostname (Very Important)
+
+Service names act as **hostnames inside Docker network**
+
+| Service Name | Acts As         |
+| ------------ | --------------- |
+| `web`        | web container   |
+| `redis`      | redis container |
+
+👉 Inside containers:
+
+```python id="x2k9q8"
+host='redis'
+```
+
+means:
+
+> Connect to the container named `redis`
+
+---
+
+## 7. Flask Redis Connection
+
+```python id="c8m1p4"
+import redis
+
+cache = redis.Redis(host='redis', port=6379)
+```
+
+### Why this works:
+
+* Docker provides **internal DNS**
+* `redis` resolves automatically to the Redis container
+
+---
+
+## 8. Communication Flow (Inside Docker)
+
+```id="f7g2h9"
+[ web container (Flask app) ]
+          |
+          | host = "redis"
+          ↓
+[ redis container ]
+```
+
+* Containers communicate using service names
+* No IP address needed
+* Docker handles name → IP resolution internally
+
+---
+
+## 9. Port Concept
+
+Redis default port:
+
+```id="p5l8r2"
+6379
+```
+
+* Inside Docker → used automatically
+* To access from host machine → expose port:
+
+```yaml id="q2m7x3"
+ports:
+  - "6379:6379"
+```
+
+---
+
+## 10. When It Works vs Fails
+
+### ✅ Works (Inside Docker)
+
+```bash id="d8k3v1"
+docker-compose up
+```
+
+* Both `web` and `redis` run in containers
+* Internal DNS resolves `redis`
+* Flask connects successfully
+
+---
+
+### ❌ Does NOT Work (Outside Docker)
+
+```bash id="n4s7t2"
+python app.py
+```
+
+* Running on your local machine
+* Your OS does NOT know hostname `redis`
+* DNS resolution fails → connection error
+
+---
+
+## 11. Why It Fails Outside Docker
+
+* `redis` is not a real domain/hostname on your system
+* It exists only inside Docker’s internal network
+* Outside Docker:
+
+  * No service discovery
+  * No internal DNS
+  * No container network
+
+---
+
+## 12. If Running Flask Locally (No Docker)
+
+Use:
+
+```python id="y3t6k9"
+cache = redis.Redis(host='localhost', port=6379)
+```
+
+And ensure:
+
+* Redis is installed and running locally
+* Port 6379 is accessible
+
+---
+
+## 13. How Service Names Should Be Used in Python
+
+* The `host` value must match the **service name in docker-compose.yml**
+
+Example:
+
+```yaml id="h2j8k4"
+services:
+  redis:
+```
+
+```python id="u9p1a6"
+host='redis'
+```
+
+If renamed:
+
+```yaml id="s5d2n8"
+services:
+  cache:
+```
+
+Then:
+
+```python id="r6w3t1"
+host='cache'
+```
+
+---
+
+## 14. Key Rules
+
+* Service name = hostname inside Docker
+* Application container = service using `build`
+* Other services = dependencies using `image`
+* Communication inside Docker uses service names
+* Outside Docker requires `localhost` or IP
+* Redis default port = `6379`
+
+---
+
+## 15. Golden Rule
+
+👉 **Service name in `docker-compose.yml` must match the hostname used in your application code**
+
+---
+
+## 16. Final Idea
+
+👉 `docker-compose.yml` is a **blueprint** that:
+
+* Builds containers (`build`)
+* Pulls images (`image`)
+* Connects services via a shared network
+* Enables inter-container communication using service names instead of IPs 🚀
+
+
+**generally, image names must refer to images available on Docker Hub (or another registry)** in docker-compose.yml, but there are a few important details:
+
+---
+
+## ✅ 1. When you use `image:` in `docker-compose.yml`
+
+```yaml
+redis:
+  image: redis
+```
+
+* Docker will try to pull the image from **Docker Hub**
+* `redis` here refers to the official Redis image on Docker Hub
+
+👉 Equivalent to:
+
+```
+docker pull redis:latest
+```
+
+---
+
+## ✅ 2. Image name format
+
+Images usually follow this structure:
+
+```
+[repository]:[tag]
+```
+
+Examples:
+
+```yaml
+image: redis:latest
+image: nginx:1.25
+image: python:3.11
+```
+
+* If tag is not specified → defaults to `latest`
+
+---
+
+## ✅ 3. Custom images (local build)
+
+If you build your own image using:
+
+```yaml
+web:
+  build: .
+```
+
+* Docker builds the image locally from your Dockerfile
+* You are **not required to have it on Docker Hub**
+
+You *can* optionally name it:
+
+```yaml
+web:
+  build: .
+  image: myapp:1.0
+```
+
+* This tags your local image as `myapp:1.0`
+
+* If you did not give image name to your application container via "image:" then DOCKER will give a random image name to it.
+
+---
+
+## ⚠️ 4. If image is NOT available on Docker Hub
+
+* Docker will fail with an error like:
+
+  ```
+  pull access denied or repository not found
+  ```
+* Unless:
+
+  * The image exists locally
+  * Or you provide a valid registry path
+
+---
+
+## 🌐 5. Private / other registries
+
+Images can also come from:
+
+* Docker Hub
+* Private registries
+* Cloud registries (AWS ECR, GCP, Azure)
+
+Example:
+
+```yaml
+image: myregistry.com/myapp:1.0
+```
+
+---
+
+## 🧠 Summary
+
+* ✔ `image:` → must exist on Docker Hub (or another registry)-: if not found then DOCKER will give ERROR by saying unable to pull image from DockerHub.
+* ✔ If not found locally, Docker tries to pull it
+* ✔ `build:` → builds image locally (no Docker Hub needed)
+* ✔ You can optionally tag built images from your local Dockerfile using `image:`
+
+---
+
+👉 **Simple rule:**
+
+* `image:` → pull existing image from docker hub.
+* `build:` → create your own image locally
+
+Here’s the **clear difference** between the two:
+
+---
+
+# 🚀 `docker compose up`
+
+* Starts containers using **existing images**
+* If images are already built → uses them directly
+* If not built yet → Docker will build only if needed (based on config), but usually expects images to exist or build cache
+
+👉 Does **not force rebuild** every time
+
+---
+
+# 🔨 `docker compose up --build`
+
+* **Forces Docker to rebuild images** before starting containers
+* Rebuilds images defined with:
+
+  ```yaml
+  build: .
+  ```
+* Ignores cache and ensures latest code is included
+
+👉 Always rebuilds application image
+
+---
+
+# 🧠 Key Difference
+
+| Command                     | Behavior                       |
+| --------------------------- | ------------------------------ |
+| `docker compose up`         | Uses existing images (fast)    |
+| `docker compose up --build` | Rebuilds images before running |
+
+---
+
+# 📌 When to use what
+
+### Use `docker compose up` when:
+
+* No code changes
+* Images already built
+* Just starting/stopping containers
+
+### Use `docker compose up --build` when:
+
+* You changed:
+
+  * Dockerfile
+  * Application code
+  * Dependencies (`requirements.txt`)
+* You want latest changes reflected
+
+---
+
+# ⚡ Simple analogy
+
+* `docker compose up` → “Run what already exists”
+* `docker compose up --build` → “Recreate everything fresh, then run”
+
+---
+
+* if u want to recreate everything without using "docker compose up --build" then remove all the images which were created by "docker compose up" command and then re-apply the command-: "docker compose up" -: this will also result in recreation of all the containers / images from scratch.
+
+
+* Also "docker-compose.yml" should be named like this only in your application folder no random names are allowed 
+
+* Also "Dockerfile" should be named like this only in your application folder no random names are allowed 
+
+
+
+## 📘 Final Note: `docker compose up`, `stop`, `down` + `docker ps`
+
+## 🚀 When you run:
+
+```
+docker compose up
+```
+
+### 🔹 What happens step-by-step:
+
+1. Reads `docker-compose.yml`
+2. Builds images (`build:`) or pulls images (`image:`)
+3. Creates containers
+4. Starts containers
+5. Connects them in a network
+
+---
+
+## 🧪 Example
+
+```yaml
+services:
+  web:
+    build: .
+    ports:
+      - "8000:5000"
+
+  redis:
+    image: redis
+```
+
+---
+
+## ▶️ Simulation: `docker compose up`
+
+```text
+Build web image
+Pull redis image
+Create containers
+Start containers
+
+Result:
+[ web container ]  ←→  [ redis container ]
+```
+
+---
+
+## 🔍 Check images
+
+```bash
+docker images
+```
+
+👉 Shows:
+
+* Images available locally
+* ❌ Does NOT show running status
+
+---
+
+## ✅ Check running containers
+
+```bash
+docker ps
+```
+
+### Output example:
+
+```text
+CONTAINER ID   IMAGE      STATUS
+abc123         web-app    Up
+def456         redis      Up
+```
+
+👉 Confirms containers are **running**.
+       All (Both) the containers are running which were written on docker-compose.yml file.
+
+---
+
+## ⏹️ `docker compose stop`
+
+```bash
+docker compose stop
+```
+
+* Stops containers
+* Containers still exist
+
+```text
+[ web (stopped) ]
+[ redis (stopped) ]
+```
+
+👉 Restart with:
+
+```bash
+docker compose start
+```
+
+---
+
+## 🧹 `docker compose down`
+
+```bash
+docker compose down
+```
+
+* Stops containers
+* Removes containers
+* Removes network
+
+```text
+No containers exist
+```
+
+👉 Images remain safe
+
+---
+
+## ⚡ Quick Comparison
+
+| Command | Containers        | Network | Images       |
+| ------- | ----------------- | ------- | ------------ |
+| `up`    | Created + Running | Created | Built/Pulled |
+| `stop`  | Stopped           | Kept    | Kept         |
+| `down`  | Removed           | Removed | Kept         |
+
+---
+
+## 🧠 Final Idea
+
+* `docker compose up` → run services
+* `docker ps` → check running containers
+* `docker images` → check available images
+* `stop` → pause
+* `down` → delete setup
+
+👉 **Images create containers, containers actually run your app** 🚀
+
+
+## 📘 Difference: `docker compose up` vs `docker compose start`
+
+---
+
+## 🚀 `docker compose up`
+
+* Creates **and starts** containers
+* Builds images (if needed)
+* Creates network
+* Runs everything from scratch if not already created
+
+👉 Used for **first time run or fresh setup**
+
+---
+
+## ▶️ `docker compose start`
+
+* Starts **already created containers**
+* Does **NOT build images**
+* Does **NOT create new containers**
+
+👉 Used after:
+
+```bash
+docker compose stop
+```
+
+---
+
+## 🧠 Key Difference
+
+| Feature            | `up` | `start` |
+| ------------------ | ---- | ------- |
+| Creates containers | ✅    | ❌       |
+| Builds images      | ✅    | ❌       |
+| Starts containers  | ✅    | ✅       |
+| Used first time    | ✅    | ❌       |
+
+---
+
+## 🔄 Flow Example
+
+```text id="rgubxq"
+docker compose up
+    ↓
+Containers created + running
+
+docker compose stop
+    ↓
+Containers stopped
+
+docker compose start
+    ↓
+Same containers started again
+```
+
+---
+
+## ⚡ Final Idea
+
+* `up` → create + build + run
+* `start` → just run existing containers
+
+👉 Use `up` first, then `start` after stopping 🚀
+
+
+Here’s the **clear difference** between `docker compose stop` and `docker compose down`:
+
+---
+
+# ⏹️ `docker compose stop`
+
+* Stops running containers **but does NOT remove them**
+* Containers still exist (just in stopped state)
+* Can be restarted later quickly
+
+### What remains:
+
+* Containers ✅
+* Networks ✅
+* Volumes ❌ (not affected)
+
+### Restart later:
+
+```bash
+docker compose start
+```
+
+---
+
+# 🧹 `docker compose down`
+
+* Stops **and removes containers**
+* Also removes:
+
+  * Containers ❌
+  * Networks ❌
+* Volumes are **NOT removed by default**
+
+### Optional:
+
+```bash
+docker compose down -v
+```
+
+* Removes volumes too ❌ (data deleted)
+
+---
+
+# 🧠 Key Differences
+
+| Feature            | `stop` | `down`            |
+| ------------------ | ------ | ----------------- |
+| Stops containers   | ✅      | ✅                 |
+| Removes containers | ❌      | ✅                 |
+| Removes networks   | ❌      | ✅                 |
+| Removes volumes    | ❌      | ❌ (unless `-v`)   |
+| Can restart easily | ✅      | ❌ (must recreate) |
+
+---
+
+# 📌 When to use what
+
+### Use `stop` when:
+
+* You want to pause containers temporarily
+* You plan to resume later
+
+```bash
+docker compose stop
+docker compose start
+```
+
+---
+
+### Use `down` when:
+
+* You want to clean everything
+* You want to reset the environment
+* You are done with the setup
+
+```bash
+docker compose down
+```
+
+---
+
+# ⚡ Simple analogy
+
+* `stop` → pause the containers
+* `down` → delete the setup
+
+
+
+ex-:
+
+(base) C:\Users\Omkar Raut\Desktop\DataSceince\Docker\docker-compose>docker images   
+REPOSITORY             TAG       IMAGE ID       CREATED        SIZE
+<none>                 <none>    009cc37796fb   20 hours ago   202MB
+welcome-app            latest    c0f4ab7c2561   47 hours ago   1.86GB
+omkar454/welcome-app   latest    c0f4ab7c2561   47 hours ago   1.86GB
+
+(base) C:\Users\Omkar Raut\Desktop\DataSceince\Docker\docker-compose>docker compose up  
+time="2026-03-25T19:29:57+05:30" level=warning msg="C:\\Users\\Omkar Raut\\Desktop\\DataSceince\\Docker\\docker-compose\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+[+] Running 2/2
+ ! web Warning  pull access denied for web-app, repository does...              2.1s 
+ ✔ redis Pulled                                                                 2.3s 
+[+] Building 15.8s (12/12) FINISHED
+ => [internal] load local bake definitions                                      0.0s
+ => => reading from stdin 579B                                                  0.0s
+ => [internal] load build definition from Dockerfile                            0.1s
+ => => transferring dockerfile: 210B                                            0.0s
+ => [internal] load metadata for docker.io/library/python:3.7-alpine            5.3s
+ => [auth] library/python:pull token for registry-1.docker.io                   0.0s
+ => [internal] load .dockerignore                                               0.0s
+ => => transferring context: 2B                                                 0.0s
+ => [1/4] FROM docker.io/library/python:3.7-alpine@sha256:f3d31c8677d03f0b3c72  0.1s
+ => => resolve docker.io/library/python:3.7-alpine@sha256:f3d31c8677d03f0b3c72  0.0s 
+ => [internal] load build context                                               0.1s 
+ => => transferring context: 2.44kB                                             0.0s
+ => CACHED [2/4] WORKDIR /app                                                   0.0s 
+ => [3/4] COPY . /app                                                           0.1s 
+ => [4/4] RUN pip install -r requirements.txt                                   7.1s
+ => exporting to image                                                          1.9s
+ => => exporting layers                                                         1.1s
+ => => exporting manifest sha256:5ac9f39e5a8bb5052c66a3e12a0706ee2cb6ee2c49f13  0.0s
+ => => exporting config sha256:e587ff090b05fadda7bde4a0626f371eab751338da895e6  0.0s
+ => => exporting attestation manifest sha256:934daa8711ebc5c87e8fa1fb2acfabcad  0.1s
+ => => exporting manifest list sha256:e5ffae14930edaad937488a1348f19caf0755b87  0.0s
+ => => naming to docker.io/library/web-app:latest                               0.0s
+ => => unpacking to docker.io/library/web-app:latest                            0.5s
+ => resolving provenance for metadata file                                      0.0s
+[+] Running 2/2
+ ✔ web-app                         Built                                        0.0s 
+ ✔ Container docker-compose-web-1  Recreate...                                  0.6s 
+Attaching to redis-1, web-1
+redis-1  | Starting Redis Server
+redis-1  | 1:C 25 Mar 2026 14:00:18.223 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+redis-1  | 1:C 25 Mar 2026 14:00:18.224 * Redis version=8.6.2, bits=64, commit=00000000, modified=1, pid=1, just started                                                  
+redis-1  | 1:C 25 Mar 2026 14:00:18.224 * Configuration loaded
+redis-1  | 1:M 25 Mar 2026 14:00:18.228 * monotonic clock: POSIX clock_gettime
+redis-1  | 1:M 25 Mar 2026 14:00:18.232 * Running mode=standalone, port=6379.        
+redis-1  | 1:M 25 Mar 2026 14:00:18.236 * <bf> RedisBloom version 8.6.0 (Git=unknown)
+redis-1  | 1:M 25 Mar 2026 14:00:18.236 * <bf> Registering configuration options: [
+redis-1  | 1:M 25 Mar 2026 14:00:18.236 * <bf>  { bf-error-rate       :      0.01 }  
+redis-1  | 1:M 25 Mar 2026 14:00:18.236 * <bf>  { bf-initial-size     :       100 }
+redis-1  | 1:M 25 Mar 2026 14:00:18.236 * <bf>  { bf-expansion-factor :         2 }
+redis-1  | 1:M 25 Mar 2026 14:00:18.236 * <bf>  { cf-bucket-size      :         2 }  
+redis-1  | 1:M 25 Mar 2026 14:00:18.236 * <bf>  { cf-initial-size     :      1024 }
+redis-1  | 1:M 25 Mar 2026 14:00:18.236 * <bf>  { cf-max-iterations   :        20 }  
+redis-1  | 1:M 25 Mar 2026 14:00:18.236 * <bf>  { cf-expansion-factor :         1 }
+redis-1  | 1:M 25 Mar 2026 14:00:18.236 * <bf>  { cf-max-expansions   :        32 }  
+redis-1  | 1:M 25 Mar 2026 14:00:18.236 * <bf> ]
+redis-1  | 1:M 25 Mar 2026 14:00:18.237 * Module 'bf' loaded from /usr/local/lib/redis/modules//redisbloom.so                                                             
+redis-1  | 1:M 25 Mar 2026 14:00:18.325 * <search> Redis version found by RedisSearch : 8.6.2 - oss                                                                       
+redis-1  | 1:M 25 Mar 2026 14:00:18.325 * <search> RediSearch version 8.6.0 (Git=7782b97)                                                                                 
+redis-1  | 1:M 25 Mar 2026 14:00:18.325 * <search> Low level api version 1 initialized successfully                                                                       
+redis-1  | 1:M 25 Mar 2026 14:00:18.326 * <search> gc: ON, prefix min length: 2, min word length to stem: 4, prefix max expansions: 200, query timeout (ms): 500, timeout policy: return, oom policy: return, cursor read size: 1000, cursor max idle (ms): 300000, max doctable size: 1000000, max number of search results:  1000000, default scorer: BM25STD,
+redis-1  | 1:M 25 Mar 2026 14:00:18.327 * <search> Initialized thread pools!
+redis-1  | 1:M 25 Mar 2026 14:00:18.327 * <search> Disabled workers threadpool of size 0                                                                                  
+redis-1  | 1:M 25 Mar 2026 14:00:18.330 * <search> Subscribe to config changes
+redis-1  | 1:M 25 Mar 2026 14:00:18.330 * <search> Subscribe to cluster slot migration events                                                                             
+redis-1  | 1:M 25 Mar 2026 14:00:18.330 * <search> Enabled role change notification
+redis-1  | 1:M 25 Mar 2026 14:00:18.331 * <search> Cluster configuration: AUTO partitions, type: 0, coordinator timeout: 0ms
+redis-1  | 1:M 25 Mar 2026 14:00:18.333 * Module 'search' loaded from /usr/local/lib/redis/modules//redisearch.so                                                         
+redis-1  | 1:M 25 Mar 2026 14:00:18.341 * <timeseries> RedisTimeSeries version 80600, git_sha=05fd355db748676861dc4c17d19c8c1ca74c0154
+redis-1  | 1:M 25 Mar 2026 14:00:18.341 * <timeseries> Redis version found by RedisTimeSeries : 8.6.2 - oss                                                               
+redis-1  | 1:M 25 Mar 2026 14:00:18.341 * <timeseries> Registering configuration options: [                                                                               
+redis-1  | 1:M 25 Mar 2026 14:00:18.342 * <timeseries>  { ts-compaction-policy   :              }
+redis-1  | 1:M 25 Mar 2026 14:00:18.342 * <timeseries>  { ts-num-threads         :            3 }                                                                         
+redis-1  | 1:M 25 Mar 2026 14:00:18.342 * <timeseries>  { ts-retention-policy    :            0 }                                                                         
+redis-1  | 1:M 25 Mar 2026 14:00:18.342 * <timeseries>  { ts-duplicate-policy    :        block }                                                                         
+redis-1  | 1:M 25 Mar 2026 14:00:18.342 * <timeseries>  { ts-chunk-size-bytes    :         4096 }                                                                         
+redis-1  | 1:M 25 Mar 2026 14:00:18.342 * <timeseries>  { ts-encoding            :   compressed }                                                                         
+redis-1  | 1:M 25 Mar 2026 14:00:18.342 * <timeseries>  { ts-ignore-max-time-diff:            0 }                                                                         
+redis-1  | 1:M 25 Mar 2026 14:00:18.342 * <timeseries>  { ts-ignore-max-val-diff :     0.000000 }                                                                         
+redis-1  | 1:M 25 Mar 2026 14:00:18.342 * <timeseries> ]
+redis-1  | 1:M 25 Mar 2026 14:00:18.343 * <timeseries> Detected redis oss
+redis-1  | 1:M 25 Mar 2026 14:00:18.348 * <timeseries> Subscribe to ASM events       
+redis-1  | 1:M 25 Mar 2026 14:00:18.348 * <timeseries> Enabled diskless replication
+redis-1  | 1:M 25 Mar 2026 14:00:18.348 * Module 'timeseries' loaded from /usr/local/lib/redis/modules//redistimeseries.so                                                
+redis-1  | 1:M 25 Mar 2026 14:00:18.357 * <ReJSON> Created new data type 'ReJSON-RL'
+redis-1  | 1:M 25 Mar 2026 14:00:18.360 * <ReJSON> version: 80600 git sha: unknown branch: unknown                                                                        
+redis-1  | 1:M 25 Mar 2026 14:00:18.360 * <ReJSON> Exported RedisJSON_V1 API
+redis-1  | 1:M 25 Mar 2026 14:00:18.360 * <ReJSON> Exported RedisJSON_V2 API         
+redis-1  | 1:M 25 Mar 2026 14:00:18.360 * <ReJSON> Exported RedisJSON_V3 API
+redis-1  | 1:M 25 Mar 2026 14:00:18.360 * <ReJSON> Exported RedisJSON_V4 API         
+redis-1  | 1:M 25 Mar 2026 14:00:18.360 * <ReJSON> Exported RedisJSON_V5 API
+redis-1  | 1:M 25 Mar 2026 14:00:18.360 * <ReJSON> Exported RedisJSON_V6 API         
+redis-1  | 1:M 25 Mar 2026 14:00:18.360 * <ReJSON> Enabled diskless replication
+redis-1  | 1:M 25 Mar 2026 14:00:18.360 * <ReJSON> Initialized shared string cache, thread safe: true.                                                                    
+redis-1  | 1:M 25 Mar 2026 14:00:18.360 * Module 'ReJSON' loaded from /usr/local/lib/redis/modules//rejson.so                                                             
+redis-1  | 1:M 25 Mar 2026 14:00:18.360 * <search> Acquired RedisJSON_V6 API
+redis-1  | 1:M 25 Mar 2026 14:00:18.361 * Server initialized
+redis-1  | 1:M 25 Mar 2026 14:00:18.364 * <search> Changing workers threadpool size from 0 to 4                                                                           
+redis-1  | 1:M 25 Mar 2026 14:00:18.364 * <search> Enabled workers threadpool of size 4                                                                                   
+redis-1  | 1:M 25 Mar 2026 14:00:18.364 * <search> Loading event started
+redis-1  | 1:M 25 Mar 2026 14:00:18.365 * Loading RDB produced by version 8.6.2      
+redis-1  | 1:M 25 Mar 2026 14:00:18.365 * RDB age 358 seconds
+redis-1  | 1:M 25 Mar 2026 14:00:18.365 * RDB memory usage when created 1.26 Mb      
+redis-1  | 1:M 25 Mar 2026 14:00:18.365 * Done loading RDB, keys loaded: 0, keys expired: 0.                                                                              
+redis-1  | 1:M 25 Mar 2026 14:00:18.366 * <search> Changing workers threadpool size from 4 to 0                                                                           
+redis-1  | 1:M 25 Mar 2026 14:00:18.367 * <search> Scheduling config_reduce_threads_job to remove all 4 threads when empty                                                
+
+web-1    |  * Serving Flask app 'appp.py'                                            
+redis-1  | 1:M 25 Mar 2026 14:00:18.367 * <search> Disabled workers threadpool of size 4                                                                                  
+web-1    |  * Debug mode: off
+redis-1  | 1:M 25 Mar 2026 14:00:18.367 * <search> Loading event ended successfully  
+web-1    | WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.                                         
+
+                                                                                     
+redis-1  | 1:M 25 Mar 2026 14:00:18.367 * DB loaded from disk: 0.005 seconds
+web-1    |  * Running on all addresses (0.0.0.0)
+redis-1  | 1:M 25 Mar 2026 14:00:18.367 * Ready to accept connections tcp            
+web-1    |  * Running on http://127.0.0.1:5000                                       
+web-1    |  * Running on http://172.18.0.3:5000                                      
+
+redis-1  | 1:M 25 Mar 2026 14:00:18.367 # WARNING: Redis does not require authentication and is not protected by network restrictions. Redis will accept connections from any IP address on any network interface.
+web-1    | 172.18.0.1 - - [25/Mar/2026 14:01:07] "GET / HTTP/1.1" 200 -              
+web-1    | 172.18.0.1 - - [25/Mar/2026 14:01:24] "GET / HTTP/1.1" 200 -
+web-1    | 172.18.0.1 - - [25/Mar/2026 14:01:25] "GET / HTTP/1.1" 200 -
+web-1    | 172.18.0.1 - - [25/Mar/2026 14:01:26] "GET / HTTP/1.1" 200 -
+web-1    | 172.18.0.1 - - [25/Mar/2026 14:01:45] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+
+
+v View in Docker Desktop   o View Config   w Enable Watch
+
+(base) C:\Users\Omkar Raut\Desktop\DataSceince\Docker\docker-compose>docker images   
+REPOSITORY             TAG       IMAGE ID       CREATED          SIZE
+web-app                latest    e5ffae14930e   20 seconds ago   96.3MB
+redis                  latest    009cc37796fb   20 hours ago     202MB
+welcome-app            latest    c0f4ab7c2561   47 hours ago     1.86GB
+omkar454/welcome-app   latest    c0f4ab7c2561   47 hours ago     1.86GB
+
+(base) C:\Users\Omkar Raut\Desktop\DataSceince\Docker\docker-compose>docker ps
+CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS          PORTS                                         NAMES
+9b73989539cb   web-app   "flask run"              25 seconds ago   Up 24 seconds   0.0.0.0:8000->5000/tcp, [::]:8000->5000/tcp   docker-compose-web-1
+9af31c414db1   redis     "docker-entrypoint.s…"   32 minutes ago   Up 24 seconds   6379/tcp                                      docker-compose-redis-1
+
+(base) C:\Users\Omkar Raut\Desktop\DataSceince\Docker\docker-compose>
+
+PS C:\Users\Omkar Raut\Desktop\DataSceince\Docker\docker-compose> docker compose stop
+time="2026-03-25T19:40:28+05:30" level=warning msg="C:\\Users\\Omkar Raut\\Desktop\\DataSceince\\Docker\\docker-compose\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+[+] Stopping 2/2 Desktop   o View Config   w Enable Watch
+ ✔ Container docker-compose-redis-1  Stopped                                                                                               0.4s 
+ ✔ Container docker-compose-web-1    Stopped                                                                                               1.4s 
+PS C:\Users\Omkar Raut\Desktop\DataSceince\Docker\docker-compose> docker compose down
+time="2026-03-25T19:40:36+05:30" level=warning msg="C:\\Users\\Omkar Raut\\Desktop\\DataSceince\\Docker\\docker-compose\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+[+] Running 3/3
+ ✔ Container docker-compose-web-1    Removed                                                                                               0.1s 
+ ✔ Container docker-compose-redis-1  Removed                                                                                               0.1s 
+ ✔ Network docker-compose_default    Removed                                                                                               0.5s 
+PS C:\Users\Omkar Raut\Desktop\DataSceince\Docker\docker-compose>

@@ -1,0 +1,13 @@
+digraph {
+	1206653888352 [label=Outlook]
+	1206612737744 [label=No shape=box]
+	1206653888352 -> 1206612737744 [label=Sunny]
+	1206617185408 [label=Yes shape=box]
+	1206653888352 -> 1206617185408 [label=Overcast]
+	1206693042928 [label=Humidity]
+	1206653888352 -> 1206693042928 [label=Rain]
+	1206617185408 [label=Yes shape=box]
+	1206693042928 -> 1206617185408 [label=High]
+	1206612737744 [label=No shape=box]
+	1206693042928 -> 1206612737744 [label=Normal]
+}

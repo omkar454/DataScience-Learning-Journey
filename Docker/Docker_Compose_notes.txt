@@ -1,0 +1,525 @@
+**Docker Compose – Final Notes**
+
+### **What is Docker Compose?**
+
+* A tool by Docker
+* Helps you define & run **multiple containers (services) together easily** .i.e. multi containers docker applications
+
+
+### **In Simple Words:**
+
+👉 Instead of running many `docker run` commands,
+you write everything in **one file** and run it in **one command**
+
+
+### **How it Works:**
+
+* Create a file → `docker-compose.yml`
+* Define all services (containers) inside it
+* Run everything together
+
+
+### **When is it Used?**
+
+* When an application needs **multiple services**
+
+* Examples:
+
+  * Web server
+  * Backend
+  * Database
+  * Cache
+
+👉 If app has more than one component → use Docker Compose
+
+---
+
+### **Why We Need Docker Compose:**
+
+👉 You **should NOT put everything in one container** as there will be-:
+❌ No Separation of Work → everything mixed (web, DB, etc.)
+❌ Hard to Maintain → one issue affects whole app
+❌ No Scalability → cannot scale individual parts
+❌ Low Reusability → cannot reuse components separately
+❌ Difficult Debugging → hard to find errors
+❌ Not Industry Practice → violates “one service = one container” rule
+
+👉 Instead, we should separate services into different containers, and allow them to communicate with each other efficiently using Docker Compose for-:
+
+* **Separation of Work:**
+
+  * Each container does one job
+
+* **Easy Maintenance:**
+
+  * If database crashes:
+
+    * Separate container → restart only DB ✅
+    * Single container → whole app affected ❌
+
+* **Scalability:**
+
+  * Scale only required service
+
+* **Reusability:**
+
+  * Containers can be reused
+
+* **Industry Practice:**
+
+  * One service = one container
+
+
+### **Connection & Working (Important Point):**
+
+* All services defined in Compose:
+
+  * Run **simultaneously**
+  * Are **automatically connected (same network)**
+  * Can **communicate with each other easily**
+
+👉 So, your app can **access all container services efficiently at the same time**
+
+---
+
+### **Main Commands:**
+
+* To Start running multi-containers application:
+
+  ```
+  docker-compose up
+  ```
+
+* To Stop running multi-containers application:
+
+  ```
+  docker-compose down
+  ```
+
+---
+
+### **Key Idea:**
+
+* Docker Compose = **run and manage full multi-service app easily, all connected and working together** 
+
+
+**`docker-compose.yml` **
+
+---
+
+### **What is `docker-compose.yml`?**
+
+* A **configuration file** used by Docker Compose
+* Written in **YAML format**
+* Defines how multiple containers (services) should run
+
+---
+
+### **Purpose:**
+
+* To **configure and manage multi-container applications** in one place
+
+---
+
+### **What it Contains:**
+
+* **Services** → containers (web, db, etc.)
+* **Images / Build info**
+* **Ports mapping**
+* **Volumes** (data storage)
+* **Networks** (communication between containers)
+
+---
+
+### **Basic Example:**
+
+```yaml
+version: '3'
+services:
+  web:
+    image: nginx
+    ports:
+      - "80:80"
+
+  db:
+    image: mysql
+```
+
+---
+
+### **How it is Used:**
+
+* Start all services:
+
+  ```
+  docker-compose up
+  ```
+
+* Stop all services:
+
+  ```
+  docker-compose down
+  ```
+
+---
+
+### **Key Points:**
+
+* Single file to manage entire app
+* All containers run **together & connected**
+* Easy to modify and reuse
+
+---
+
+### **Key Idea:**
+👉 `docker-compose.yml` = **blueprint of your multi-container application**
+
+
+**Flask + ENV Variables – Short Notes (Complete)**
+
+---
+
+## **Are ENV names important?**
+
+👉 **Yes, they must be exactly correct (case-sensitive)** ✅
+
+* Wrong name → Flask will **ignore it**
+
+---
+
+## **Common ENV Variables for `flask run`:**
+
+* `FLASK_APP` → which file to run
+* `FLASK_ENV` → development / production mode
+* `FLASK_RUN_HOST` → host address (e.g., `0.0.0.0`)
+* `FLASK_RUN_PORT` → port number
+
+---
+
+## **Example (Correct Usage):**
+
+```bash
+FLASK_APP=app.py
+FLASK_ENV=development
+FLASK_RUN_HOST=0.0.0.0
+FLASK_RUN_PORT=5000
+
+flask run
+```
+
+---
+
+## **What They Do:**
+
+* `FLASK_APP` → selects your app file
+* `FLASK_ENV` → enables debug mode (if development)
+* `FLASK_RUN_HOST` → makes app accessible outside container
+* `FLASK_RUN_PORT` → sets port number
+
+---
+
+## **Wrong Example:**
+
+```bash
+flask_app=app.py   ❌
+FLASK_host=0.0.0.0 ❌
+```
+
+---
+
+## **Key Points:**
+
+* ✔️ Names are **case-sensitive**
+* ✔️ Must match exactly
+* ✔️ Flask **automatically reads these ENV variables** and acts accordingly on command-: "flask run"
+
+---
+
+## **Final Idea:**
+
+👉 `flask run` uses ENV variables to decide **how and where to run your app** 🚀
+
+**Answer – Short Note**
+
+👉 **Yes, correct understanding ✅**
+
+---
+
+### **ENV Variables in Flask (Clarification):**
+
+* ✔️ **Predefined Flask ENV variables must be exact:**
+
+  * `FLASK_APP`
+  * `FLASK_ENV`
+  * `FLASK_RUN_HOST`
+  * `FLASK_RUN_PORT`
+
+👉 These names are fixed because **Flask internally looks for them**
+
+---
+
+### **Custom ENV Variables:**
+
+* ✔️ You can create your own variables with **any name**
+
+* Example:
+
+  ```bash
+  MY_NAME=Omkar
+  DB_URL=mysql://localhost
+  ```
+
+* Use in app:
+
+  ```python
+  import os
+  name = os.getenv("MY_NAME")
+  ```
+
+---
+
+### **Key Difference:**
+
+* Flask ENV → must be exact (framework-specific)
+* Custom ENV → you can name anything
+
+---
+
+### **Final Idea:**
+
+👉 Flask reads only **its predefined ENV names** and runs the application automatically according to the values of these predefined ENV variables values on command-: "flask run",
+👉 your app can use **any custom ENV variables you define** and accordingly use it in your app via "os" module 🚀
+
+## 📘 Short Note: Running Flask App
+
+* **`flask run`**
+
+  * Starts the Flask server without `app.run()`
+  * Uses `FLASK_APP=app.py`
+  * Default port: **5000**
+  * Runs on `127.0.0.1:5000` by default
+
+* **`python app.py`**
+
+  * Requires `app.run()` inside the file
+  * Without `app.run()`, the app will **not start**
+
+---
+
+## 🔑 Key Difference
+
+* `flask run` → CLI command starts server automatically
+* `python app.py` → you must explicitly call `app.run()`
+
+---
+
+## ⚡ Summary
+
+* `flask run` ❌ no `app.run()` needed
+* `python app.py` ✅ `app.run()` required
+* Default port in both cases → **5000**
+* Default host:
+
+  * `flask run` → `127.0.0.1` (localhost)
+  * `app.run()` → `127.0.0.1` (by default, unless you specify otherwise)
+
+---
+
+## ⚠️ Important clarification:
+
+* By default, both run on `127.0.0.1`, **not accessible outside Docker/network**
+* For Docker/external access, you must use:
+
+  ```python
+  app.run(host="0.0.0.0", port=5000)
+  ```
+
+---
+
+✅ So your statement is correct in general, just remember:
+
+* Host is localhost by default in both cases
+* But can be changed (especially in Docker)
+
+
+
+## 📘 Combined Notes: Docker Compose (Service Names, Images, Dockerfile, and Python Connection)
+
+# 1. Docker Compose Example
+
+```yaml id="c9k2v1"
+services:
+  web:
+    build: .
+    ports:
+      - "8000:5000"
+
+  redis:
+    image: redis
+```
+
+---
+
+# 2. What Each Part Means
+
+## 🔹 Service Names
+
+* `web` and `redis` are **service names**
+* They define containers in docker-compose
+* They also act as **hostnames inside Docker network**
+
+---
+
+## 🧠 Important Clarification About `web`
+
+👉 **No — `web` is NOT the container name and NOT the Dockerfile name.**
+
+---
+
+### What `web` actually is:
+
+```yaml id="w3k8n2"
+web:
+  build: .
+  ports:
+    - "8000:5000"
+```
+
+* `web` = **service name**
+* It is:
+
+  * Internal identifier
+  * Network hostname (inside Docker)
+  * Used for communication between services
+
+---
+
+## 📌 Relationship with Dockerfile
+
+* `build: .` means:
+  👉 Docker will look for a **Dockerfile in the current directory**
+
+* The Dockerfile is used to **build an image for the `web` service**
+
+---
+
+## 🔑 Important distinctions
+
+| Item           | Meaning                                             |
+| -------------- | --------------------------------------------------- |
+| `web`          | Service name (container identity in docker-compose) |
+| `build: .`     | Build context (current folder)                      |
+| `Dockerfile`   | File used to build the image                        |
+| Container name | Auto-generated unless explicitly set                |
+
+---
+
+## 📡 Inside Docker network
+
+* `web` can also act as a **hostname**
+* Other services can connect using: [just like "redis" service name]
+
+```python id="h2k9p7"
+host='web'
+```
+
+---
+
+# 3. Redis Service (Image vs Service Name)
+
+```yaml id="y7k3a2"
+redis:
+  image: redis
+```
+
+---
+
+## 🧠 Key Concept
+
+| Term           | Meaning          |
+| -------------- | ---------------- |
+| `redis:`       | Service name     |
+| `image: redis` | Docker Hub image |
+
+👉 These are different.
+
+---
+
+## 🔑 What Python uses
+
+```python id="p2x9k1"
+cache = redis.Redis(host='redis', port=6379)
+```
+
+* `host='redis'` refers to the **service name**
+* NOT the image name
+
+---
+
+## 📡 How it works internally
+
+Docker creates a network and maps:
+
+```id="l76h86"
+redis → IP of redis container
+web   → IP of web container
+```
+
+So:
+
+```python id="q8m2z7"
+host='redis'
+```
+
+means:
+
+> Connect to the container whose service name is `redis`
+
+---
+
+# 4. Relationship Flow
+
+```id="n7p3k5"
+Service name (web / redis)
+        ↓
+Docker network DNS
+        ↓
+Container IP
+        ↓
+Runs image (Docker Hub or built via Dockerfile)
+```
+
+---
+
+# 5. Key Distinctions Summary
+
+| Component      | Purpose                     | Used in Python?    |
+| -------------- | --------------------------- | ------------------ |
+| `web`          | Service name / hostname     | ✅ (`host='web'`)   |
+| `redis`        | Service name / hostname     | ✅ (`host='redis'`) |
+| `image: redis` | Docker image                | ❌                  |
+| `build: .`     | Build image from Dockerfile | ❌                  |
+| Dockerfile     | Defines how image is built  | ❌                  |
+| Container name | Auto-generated unless set   | ❌ (optional)       |
+
+---
+
+# 6. Golden Rules
+
+* Service name = hostname inside Docker network
+* Python connects using **service name**, not image name in .py files
+* `build: .` → builds image using Dockerfile
+* `image:` → pulls prebuilt image from registry
+* Docker handles internal DNS resolution automatically
+
+---
+
+# 7. Final Idea
+
+👉 `docker-compose.yml` ties everything together:
+
+* Builds containers (`build`)
+* Pulls images (`image`)
+* Assigns service names
+* Enables communication between containers using those names
+* Uses internal DNS to resolve service names to container IPs 🚀

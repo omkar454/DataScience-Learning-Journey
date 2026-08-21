@@ -1,0 +1,138 @@
+* all developers have their own set of **local branches**, which are **completely independent** of each other.
+
+### 🔹 **What this means:**
+
+* Each developer works on their **own local repository**
+* Their branches:
+
+  * Can have different commits
+  * Can be ahead/behind others
+  * Can even have different branch structures
+
+  ### 🔹 **Important Clarification**
+
+* Independence exists **locally only**
+* They become shared **only when pushed to the remote repository**
+
+### 🔹 **Example**
+
+* Dev A → has branch `feature-login` with 3 commits
+* Dev B → may:
+
+  * Not have that branch at all
+  * Or have an older version of it
+
+  ### 🔥 **Final Line (Best for Notes)**
+
+* Each developer has their own independent local branches, and they only sync with others when changes are **pushed to or pulled from the remote repository**.
+
+* Developers can share the same remote (GitHub) branches for fetch and pull operations, but their local branches are always independent. Even if the branch names are the same (e.g., main), their local branches can differ in commits and state. They may become in sync by pulling changes from the common remote repository, but they still remain independent copies and can diverge again at any time.
+
+
+
+
+
+
+
+
+
+
+
+
+
+PS C:\Users\Omkar Raut\Desktop\Dev-A\DataScience-Learning-Journey> git branch     
+  developer
+* main
+PS C:\Users\Omkar Raut\Desktop\Dev-A\DataScience-Learning-Journey> git branch devA
+PS C:\Users\Omkar Raut\Desktop\Dev-A\DataScience-Learning-Journey> git checkout devA
+Switched to branch 'devA'
+PS C:\Users\Omkar Raut\Desktop\Dev-A\DataScience-Learning-Journey> git status
+On branch devA
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   tester/dev.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+PS C:\Users\Omkar Raut\Desktop\Dev-A\DataScience-Learning-Journey> git commit -m "devA commiter"
+On branch devA
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   tester/dev.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+PS C:\Users\Omkar Raut\Desktop\Dev-A\DataScience-Learning-Journey> git add .                  
+PS C:\Users\Omkar Raut\Desktop\Dev-A\DataScience-Learning-Journey> git commit -m "devA commiter"
+[devA 867e28d] devA commiter
+ 1 file changed, 1 insertion(+)
+PS C:\Users\Omkar Raut\Desktop\Dev-A\DataScience-Learning-Journey> git branch
+* devA
+  developer
+  main
+PS C:\Users\Omkar Raut\Desktop\Dev-A\DataScience-Learning-Journey> git checkout main
+Switched to branch 'main'
+Your branch is up to date with 'origin/main'.
+PS C:\Users\Omkar Raut\Desktop\Dev-A\DataScience-Learning-Journey> git merge devA
+Updating bbad5ef..867e28d
+Fast-forward
+ tester/dev.txt | 1 +
+ 1 file changed, 1 insertion(+)
+PS C:\Users\Omkar Raut\Desktop\Dev-A\DataScience-Learning-Journey> git branch
+  devA
+  developer
+* main
+PS C:\Users\Omkar Raut\Desktop\Dev-A\DataScience-Learning-Journey> git push origin main
+Enumerating objects: 7, done.
+Counting objects: 100% (7/7), done.
+Delta compression using up to 4 threads
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (4/4), 382 bytes | 127.00 KiB/s, done.
+Total 4 (delta 0), reused 0 (delta 0), pack-reused 0 (from 0)
+To https://github.com/omkar454/DataScience-Learning-Journey
+   bbad5ef..867e28d  main -> main
+PS C:\Users\Omkar Raut\Desktop\Dev-A\DataScience-Learning-Journey> git pull            
+Already up to date.
+
+
+
+
+
+
+
+
+
+PS C:\Users\Omkar Raut\Desktop\Dev-B\DataScience-Learning-Journey> git branch        
+* main
+PS C:\Users\Omkar Raut\Desktop\Dev-B\DataScience-Learning-Journey> git branch devB
+PS C:\Users\Omkar Raut\Desktop\Dev-B\DataScience-Learning-Journey> git branch     
+  devB
+* main
+PS C:\Users\Omkar Raut\Desktop\Dev-B\DataScience-Learning-Journey> git add .
+PS C:\Users\Omkar Raut\Desktop\Dev-B\DataScience-Learning-Journey> git commit -m "devB commiter"
+[main 1e62438] devB commiter
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+PS C:\Users\Omkar Raut\Desktop\Dev-B\DataScience-Learning-Journey> git push origin main
+To https://github.com/omkar454/DataScience-Learning-Journey
+ ! [rejected]        main -> main (non-fast-forward)
+error: failed to push some refs to 'https://github.com/omkar454/DataScience-Learning-Journey'
+hint: Updates were rejected because the tip of your current branch is behind
+hint: its remote counterpart. If you want to integrate the remote changes,
+hint: use 'git pull' before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+PS C:\Users\Omkar Raut\Desktop\Dev-B\DataScience-Learning-Journey> git pull
+Auto-merging tester/dev.txt
+CONFLICT (content): Merge conflict in tester/dev.txt
+Automatic merge failed; fix conflicts and then commit the result.
+PS C:\Users\Omkar Raut\Desktop\Dev-B\DataScience-Learning-Journey> git add .
+PS C:\Users\Omkar Raut\Desktop\Dev-B\DataScience-Learning-Journey> git commit -m "conflict resolver"
+[main f58e6d9] conflict resolver
+PS C:\Users\Omkar Raut\Desktop\Dev-B\DataScience-Learning-Journey> git push origin main       
+Enumerating objects: 18, done.
+Counting objects: 100% (18/18), done.
+Delta compression using up to 4 threads
+Compressing objects: 100% (9/9), done.
+Writing objects: 100% (12/12), 1.09 KiB | 124.00 KiB/s, done.
+Total 12 (delta 0), reused 0 (delta 0), pack-reused 0 (from 0)
+To https://github.com/omkar454/DataScience-Learning-Journey
+   867e28d..f58e6d9  main -> main

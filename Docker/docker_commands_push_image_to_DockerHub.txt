@@ -1,0 +1,501 @@
+**1) Docker Login Command 
+
+* **Command:**
+  `docker login`
+
+* **Purpose:**
+  Used to authenticate (log in) to your Docker account (usually Docker Hub).
+
+* **What happens:**
+
+  * Prompts for **username** and **password / access token**
+  * Stores credentials locally for future use
+
+* **Why needed:**
+
+  * To **push images** to repositories
+  * To **pull private images**
+
+* **Reason (Private Images):**
+
+  * Private images are **restricted** (not public)
+  * Docker Hub needs to **verify your identity** as only allowed identities/users which are set by owner of this private image can access this private image and not others.
+  * Login provides **authentication token** to check access permissions
+  * Without login → **access denied** when pulling private images
+
+* **Tags (Options):**
+
+  * `-u` → Specify username
+
+    ```
+    docker login -u your_username
+    ```
+  * `-p` → Specify password (not recommended directly)
+
+    ```
+    docker login -u your_username -p your_password
+    ```
+  * `--password-stdin` → Secure way to pass password
+
+    ```
+    echo "your_password" | docker login -u your_username --password-stdin
+    ```
+
+* **Example flow:**
+
+  ```
+  docker login
+  Username: your_username
+  Password: your_password
+  ```
+
+* **Tip:**
+  Use **access tokens** instead of passwords for better security
+
+  ex-:
+PS C:\Users\Omkar Raut> docker login
+Authenticating with existing credentials... [Username: omkar454]
+
+i Info → To login with a different account, run 'docker logout' followed by 'docker login'
+
+
+Login Succeeded
+PS C:\Users\Omkar Raut>
+
+
+**2) Docker Image Naming**
+
+### **Image Name Format:**
+
+* `username/image_name`
+
+### **When NOT Required (Short):**
+
+* Not needed when working **locally only** .i.e. on your local device only
+
+* Used for:
+
+  * Building and testing images locally on your device
+  * Running containers on your system
+
+* Example:
+
+  ```
+  docker build -t myapp .
+  docker run myapp
+  ```
+
+* **Reason:**
+
+  * Image stays on your local machine
+  * No need to identify owner (no Docker Hub involved)
+
+
+### **When REQUIRED:**
+
+* When pushing to Docker Hub
+
+* Example:
+
+  ```
+  docker tag myapp username/myapp
+  docker push username/myapp
+  ```
+
+---
+
+### **Reason:**
+
+* `username` identifies **who owns the image**
+* Docker Hub uses it to decide **where to store the image** .i..e. store it in which users dockerHub account.
+* Without it → push will fail
+
+---
+
+### **For Pulling Images:**
+
+* **Public Image:**
+
+  ```
+  docker pull nginx
+  ```
+
+  (No username needed)
+
+* **Private Image:**
+
+  ```
+  docker pull username/myapp
+  ```
+
+  * requires `docker login` and username is also needed to be written while pulling.
+
+
+### **Key Points:**
+
+* Local → simple name works
+* Docker Hub → must use `username/image_name`
+* Private images → need login + correct username
+
+3) **Renaming a Docker Image**
+
+### **Ways to Rename an Image:**
+
+#### **1. Delete & Rebuild with New Name**
+
+* Build image again with new name
+
+* Example:
+
+  ```
+  docker build -t newname .
+  ```
+
+* (Optional) Delete old image:
+
+  ```
+  docker rmi oldname
+  ```
+
+* **Use when:**
+
+  * You are rebuilding the image anyway
+  * No need to keep old image
+
+---
+
+#### **2. Using `docker tag` (Recommended)**
+
+* Adds a **new name (tag)** to the same image
+
+* Example:
+
+  ```
+  docker tag oldname newname
+  ```
+
+* For Docker Hub:
+
+  ```
+  docker tag myapp username/myapp
+  ```
+
+* **Important:**
+
+  * ❌ Does NOT actually rename the image
+  * ✅ It **creates another reference (alias)** to the same image
+  * Both `oldname` and `newname` will exist
+
+---
+
+### **Key Points:**
+
+* `docker tag` → adds new name, does NOT remove old one
+* Rebuild method → actual replacement (if old deleted)
+* Tagging is faster and commonly used
+
+ex-:
+PS C:\Users\Omkar Raut> docker tag welcome-app omkar454/welcome-app
+PS C:\Users\Omkar Raut> docker images
+REPOSITORY             TAG       IMAGE ID       CREATED        SIZE
+welcome-app            latest    c0f4ab7c2561   42 hours ago   1.86GB
+omkar454/welcome-app   latest    c0f4ab7c2561   42 hours ago   1.86GB
+PS C:\Users\Omkar Raut>
+
+* So; same docker image with id-: "c0f4ab7c2561" has 2 names/references/repositories -: "welcome-app" & "omkar454/welcome-app"
+
+When you rebuild an image, a new image is created with a different Image ID and name (repository/tag). All the layers of that image will be same as of previous one but will be treated as a complete new and different image with different "name" and "image_id" due to REBUILDING of the IMAGE.
+
+4) **Docker Push Command**
+
+---
+
+### **Command:**
+
+```
+docker push username/image_name:tag
+```
+
+---
+
+### **Purpose:**
+
+* Used to upload (push) your image to Docker Hub
+
+---
+
+### **About Tag (`:tag`):**
+
+* Tag represents **version of the image**
+
+* Format:
+  `username/image_name:tag`
+
+* Example:
+
+  ```
+  username/myapp:v1
+  username/myapp:latest
+  ```
+
+* **If no tag given:**
+
+  * Docker uses `latest` by default
+
+---
+
+### **Important (Different Tags Local vs Remote):**
+
+* ✅ Yes, it is possible
+
+* Your **local image tag** and **Docker Hub tag** can be different
+
+* Example:
+
+  ```
+  docker tag myapp:v1 username/myapp:prod
+  docker push username/myapp:prod
+  ```
+
+* **Explanation:**
+
+  * Local image → `myapp:v1`
+  * Pushed image → `username/myapp:prod`
+  * Both point to **same image**, just different names/tags
+
+---
+
+### **Requirements:**
+
+* Must be logged in → `docker login`
+* Image must be properly tagged:
+
+  ```
+  docker tag myapp username/myapp:tag
+  ```
+
+---
+
+### **Example Flow:**
+
+```
+docker build -t myapp:v1 .
+docker tag myapp:v1 username/myapp:prod
+docker push username/myapp:prod
+```
+
+---
+
+### **What Happens:**
+
+* Specific **tag/version** of image is pushed
+* Helps manage multiple versions of same image
+
+---
+
+### **Key Points:**
+
+* Tag is important for **version control**
+* Local and remote tags can be different
+* `docker tag` is used to map local → remote naming
+* `latest` is default but not always recommended
+
+*  User must be logged in to Docker Hub before pushing**
+
+## **Reason:**
+
+* Docker needs to **authenticate your identity**
+* To verify:
+
+  * **Who is pushing the image**
+  * **Which repository it belongs to**
+* Without login → ❌ **push will fail (access denied)**
+
+
+### **Command:**
+
+```
+docker login
+```
+
+### **Key Point:**
+
+* Login is **mandatory for push**, but **not required for pulling public images**
+
+ex-: 
+PS C:\Users\Omkar Raut> docker push omkar454/welcome-app:latest
+The push refers to repository [docker.io/omkar454/welcome-app]
+26dfe2fac1c4: Waiting
+d5b525c92eab: Pushed
+795dbedde24d: Pushed
+79d5bd8a8d26: Pushed
+89d573bf42b3: Pushed
+91c91c91f1d2: Layer already exists
+4f4fb700ef54: Layer already exists
+fff5c0dd1bf6: Already exists
+081ccf923272: Layer already exists
+c9723aa529b0: Pushed
+3e8da11c12de: Layer already exists
+latest: digest: sha256:c0f4ab7c25613f91c91f228d90650effdf7678cc2eed3e828839f318c782cc5d size: 856
+PS C:\Users\Omkar Raut>
+
+
+**Docker Push Taking Time**
+
+### **Why Push Takes Time:**
+
+* **Large Image Size**
+
+  * Your image ~ **1.86 GB**
+  * Bigger image → more upload time
+
+* **Layer-wise Upload**
+
+  * Docker pushes images in **multiple layers**
+  * Each layer uploads separately → increases total time
+
+* **Internet Upload Speed**
+
+  * Depends on **upload speed** (not download)
+  * Slow network → slow push
+
+* **First Push is Slow**
+
+  * All layers uploaded initially
+  * Next pushes → only changed layers (faster)
+
+---
+
+### **What You Should Do:**
+
+* ✔️ Be patient (normal behavior)
+* ✔️ Use stable internet
+* ✔️ Avoid interrupting the push
+
+---
+
+### **Key Idea:**
+
+* Docker push = **uploading large data to cloud (DOCKERHUB)**
+* Larger image + slow upload = more time
+
+---
+
+**Docker Login Command**
+
+### **Command:**
+
+```
+docker login
+```
+
+---
+
+### **Purpose:**
+
+* Used to authenticate with Docker Hub
+
+---
+
+### **Why Needed:**
+
+* Required for:
+
+  * **Pushing images**
+  * **Pulling private images**
+
+* **Reason:**
+
+  * Docker verifies your identity
+  * Checks access permissions
+  * Without login → ❌ access denied
+
+---
+
+### **Key Point:**
+
+* ✅ Login required for push
+* ❌ Not required for pulling public images
+
+5) **Docker Logout Command**
+
+---
+
+### **Command:**
+
+```
+docker logout
+```
+
+---
+
+### **Purpose:**
+
+* Used to log out from Docker Hub
+
+---
+
+### **Why Needed:**
+
+* Removes stored credentials from your system
+
+* Useful for:
+
+  * Switching accounts
+  * Security (especially on shared systems)
+
+* After logout:
+
+  * ❌ Cannot push images 
+  * ❌ Cannot pull private images but CAN PULL PUBLIC IMAGES
+  * (Until you login again)
+
+  ### **Key Point:**
+
+* `docker logout` clears authentication
+* Use `docker login` again when access is needed to your docker & dockerHub account
+
+
+* **Docker Hub Repository**
+
+### What a Repository Contains:
+
+* A repository in Docker Hub stores:
+
+  * **Docker Images**
+  * Different **versions (tags)** of the same image
+
+---
+
+### **Can it contain anything?**
+
+* ❌ No, not “anything”
+* ✅ It only contains **Docker images and their tags**
+
+---
+
+### **What is inside an Image:**
+
+* Application code
+* Dependencies (libraries, packages)
+* Runtime (e.g., Python, Node, Java)
+* Configuration files
+
+---
+
+### **Example:**
+
+* Repository: `omkar454/welcome-app`
+
+  * `latest`
+  * `v1`
+  * `prod`
+
+👉 All are **versions of same application image**
+
+---
+
+### **Key Idea:**
+
+* Repository = **collection of related Docker images (versions)**
+* Not a general file storage system like GITHUB.
