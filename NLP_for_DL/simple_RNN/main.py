@@ -17,7 +17,7 @@ model = load_model('simple_rnn_imdb.h5')
 def decode_review(encoded_review):
     return ' '.join([reverse_word_index.get(i - 3, '?') for i in encoded_review])
 
-# Function to preprocess user input
+# Function to preprocess user input .i.e applying OHE (One Hot Encoding) / OHR (One Hot Representation) vectorization technique on the I/P data using word-index of IMDB .i.e. vocabulory/vocabulory-index values of IMDB Dataset.
 def preprocess_text(text):
     words = text.lower().split()
     encoded_review = [word_index.get(word, 2) + 3 for word in words]
@@ -35,10 +35,10 @@ st.write('Enter a movie review to classify it as positive or negative.')
 user_input = st.text_area('Movie Review')
 
 if st.button('Classify'):
-
+    # OHR (One-Hot-Representation not Encoding) of the given I/P review by the user.
     preprocessed_input=preprocess_text(user_input)
 
-    ## MAke prediction
+    ## Make prediction
     prediction=model.predict(preprocessed_input)
     sentiment='Positive' if prediction[0][0] > 0.5 else 'Negative'
 
@@ -47,4 +47,3 @@ if st.button('Classify'):
     st.write(f'Prediction Score: {prediction[0][0]}')
 else:
     st.write('Please enter a movie review.')
-
